@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="ImageProcessing.NumbersBySignature.NumbersBySignatureView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ImageProcessing.NumbersBySignature"
+             mc:Ignorable="d" 
+             Background="White"
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance d:Type={x:Type local:NumbersBySignatureViewModel}}"
+             >
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Padding" Value="0 7" />
+        </Style>
+    </UserControl.Resources>
+    <DockPanel Margin="5">
+        <TextBlock Text="Recognize Numbers by Signature" DockPanel.Dock="Top" FontSize="20" />
+        <TextBlock Text="These are the raw images of our numbers. To identify the displayed images we will process the following steps one after another." DockPanel.Dock="Top" />
+        <WrapPanel DockPanel.Dock="Top">
+            <Image Source="{Binding RawNumbers.Number1Image}" Height="50" />
+            <Image Source="{Binding RawNumbers.Number2Image}" Height="50" />
+            <Image Source="{Binding RawNumbers.Number3Image}" Height="50" />
+            <Image Source="{Binding RawNumbers.Number4Image}" Height="50" />
+            <Image Source="{Binding RawNumbers.Number5Image}" Height="50" />
+            <Image Source="{Binding RawNumbers.Number6Image}" Height="50" />
+            <Image Source="{Binding RawNumbers.Number7Image}" Height="50" />
+            <Image Source="{Binding RawNumbers.Number8Image}" Height="50" />
+            <Image Source="{Binding RawNumbers.Number9Image}" Height="50" />
+            <Image Source="{Binding RawNumbers.Number0Image}" Height="50" />
+        </WrapPanel>
+        <TextBlock Text="Step 1: Converting the images to black and white." DockPanel.Dock="Top" />
+        <WrapPanel DockPanel.Dock="Top">
+            <Image Source="{Binding BlackWhiteNumbers.Number1Image}" Height="50" />
+            <Image Source="{Binding BlackWhiteNumbers.Number2Image}" Height="50" />
+            <Image Source="{Binding BlackWhiteNumbers.Number3Image}" Height="50" />
+            <Image Source="{Binding BlackWhiteNumbers.Number4Image}" Height="50" />
+            <Image Source="{Binding BlackWhiteNumbers.Number5Image}" Height="50" />
+            <Image Source="{Binding BlackWhiteNumbers.Number6Image}" Height="50" />
+            <Image Source="{Binding BlackWhiteNumbers.Number7Image}" Height="50" />
+            <Image Source="{Binding BlackWhiteNumbers.Number8Image}" Height="50" />
+            <Image Source="{Binding BlackWhiteNumbers.Number9Image}" Height="50" />
+            <Image Source="{Binding BlackWhiteNumbers.Number0Image}" Height="50" />
+        </WrapPanel>
+    </DockPanel>
+</UserControl>
