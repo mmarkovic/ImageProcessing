@@ -1,5 +1,6 @@
 ﻿namespace ImageProcessing.NumbersBySignature
 {
+    using System.Collections.Generic;
     using System.Windows.Media.Imaging;
 
     /// <summary>
@@ -7,6 +8,21 @@
     /// </summary>
     public class ImagesModel
     {
+        public ImagesModel(IReadOnlyList<BitmapImage> numberImages)
+        {
+            this.Number0Image = numberImages[0];
+            this.Number1Image = numberImages[1];
+            this.Number2Image = numberImages[2];
+            this.Number3Image = numberImages[3];
+            this.Number4Image = numberImages[4];
+            this.Number5Image = numberImages[5];
+            this.Number6Image = numberImages[6];
+            this.Number7Image = numberImages[7];
+            this.Number8Image = numberImages[8];
+            this.Number9Image = numberImages[9];
+            this.Number9Image = numberImages[9];
+        }
+
         public ImagesModel(
             BitmapImage number0Image,
             BitmapImage number1Image,
