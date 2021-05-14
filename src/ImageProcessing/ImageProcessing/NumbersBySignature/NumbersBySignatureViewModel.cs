@@ -30,15 +30,21 @@
 
             var rawBitmaps = rawBitmapImages.Select(ToBitmap).ToArray();
             var blackWhiteBitmaps = rawBitmaps.Select(ImageProcessor.ConvertToBlackAndWhite).ToArray();
-
             var blackWhiteBitmapImages = blackWhiteBitmaps.Select(ToImage).ToArray();
 
             this.BlackWhiteNumbers = new ImagesModel(blackWhiteBitmapImages);
+
+            var sharpBitmaps = blackWhiteBitmaps.Select(ImageProcessor.RemoveNoise).ToArray();
+            var sharpBitmapImages = sharpBitmaps.Select(ToImage).ToArray();
+
+            this.SharpNumbers = new ImagesModel(sharpBitmapImages);
         }
 
         public ImagesModel RawNumbers { get; }
 
         public ImagesModel BlackWhiteNumbers { get; }
+
+        public ImagesModel SharpNumbers { get; }
 
         private static BitmapImage ToImage(byte[] array)
         {

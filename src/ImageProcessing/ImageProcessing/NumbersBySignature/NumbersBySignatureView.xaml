@@ -20,5 +20,7 @@
         <local:ImageRowView DockPanel.Dock="Top" DataContext="{Binding RawNumbers}" />
         <TextBlock Text="Step 1: Converting the images to black and white." DockPanel.Dock="Top" />
         <local:ImageRowView DockPanel.Dock="Top" DataContext="{Binding BlackWhiteNumbers}" />
+        <TextBlock Text="Step 2: Sharpen the image." DockPanel.Dock="Top" />
+        <local:ImageRowView DockPanel.Dock="Top" DataContext="{Binding SharpNumbers}" />
     </DockPanel>
 </UserControl>
