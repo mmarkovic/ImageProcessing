@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <Authors>Marko Marković</Authors>
+        <Copyright>Marko Marković</Copyright>
+        <Description>Sample application for demonstrating image processing techniques using C# .NET.</Description>
+        <Title>Image Processing Library</Title>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <PackageLicenseExpression>MIT License</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/mmarkovic/ImageProcessing</PackageProjectUrl>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
+    </ItemGroup>
+
+</Project>

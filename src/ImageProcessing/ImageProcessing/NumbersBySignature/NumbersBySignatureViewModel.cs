@@ -1,86 +1,135 @@
 ﻿namespace ImageProcessing.NumbersBySignature
 {
-    using System.IO;
-    using System.Drawing;
-    using System.Drawing.Imaging;
+    using System.ComponentModel;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Windows.Media.Imaging;
 
+    using ImageProcessing.Annotations;
     using ImageProcessing.NumbersBySignature.img;
 
-    public class NumbersBySignatureViewModel
+    using ImageProcessingLib;
+
+    public class NumbersBySignatureViewModel : INotifyPropertyChanged
     {
+        private readonly BitmapImage[] rawBitmapImages;
+
+        private ImagesModel numbersAsBinaryImage;
+        private ImagesModel numbersAsSmoothedBinaryImages;
+        private ImagesModel numbersAsThinnedBinaryImages;
+
         public NumbersBySignatureViewModel()
         {
-            BitmapImage[] rawBitmapImages = 
+            this.rawBitmapImages = new[]
             {
-                ToImage(ImageResource._0),
-                ToImage(ImageResource._1),
-                ToImage(ImageResource._2),
-                ToImage(ImageResource._3),
-                ToImage(ImageResource._4),
-                ToImage(ImageResource._5),
-                ToImage(ImageResource._6),
-                ToImage(ImageResource._7),
-                ToImage(ImageResource._8),
-                ToImage(ImageResource._9)
+                ImageResource._0.ToBitmapImage(),
+                ImageResource._1.ToBitmapImage(),
+                ImageResource._2.ToBitmapImage(),
+                ImageResource._3.ToBitmapImage(),
+                ImageResource._4.ToBitmapImage(),
+                ImageResource._5.ToBitmapImage(),
+                ImageResource._6.ToBitmapImage(),
+                ImageResource._7.ToBitmapImage(),
+                ImageResource._8.ToBitmapImage(),
+                ImageResource._9.ToBitmapImage()
             };
 
-            this.RawNumbers = new ImagesModel(rawBitmapImages);
+            this.RawNumbers = new ImagesModel(this.rawBitmapImages);
+        }
 
-            var rawBitmaps = rawBitmapImages.Select(ToBitmap).ToArray();
-            var blackWhiteBitmaps = rawBitmaps.Select(ImageProcessor.ConvertToBlackAndWhite).ToArray();
-            var blackWhiteBitmapImages = blackWhiteBitmaps.Select(ToImage).ToArray();
+        public event PropertyChangedEventHandler? PropertyChanged;
 
-            this.BlackWhiteNumbers = new ImagesModel(blackWhiteBitmapImages);
+        public void ProcessImages()
+        {
+            var binaryImages = this.rawBitmapImages
+                .Select(x => x.ToBitmap())
+                .Select(BinaryImage.FromImage)
+                .ToArray();
 
-            var sharpBitmaps = blackWhiteBitmaps.Select(ImageProcessor.RemoveNoise).ToArray();
-            var sharpBitmapImages = sharpBitmaps.Select(ToImage).ToArray();
+            var binaryBitmapImages = binaryImages
+                .Select(bi => bi.ToBitmap().ToBitmapImage())
+                .ToArray();
 
-            this.SharpNumbers = new ImagesModel(sharpBitmapImages);
+            this.NumbersAsBinaryImage = new ImagesModel(binaryBitmapImages);
+
+            var smoothBitmaps = binaryImages
+                .Select(ImageProcessor.Smoothing)
+                .ToArray();
+
+            var smoothBitmapImages = smoothBitmaps
+                .Select(bi => bi.ToBitmap().ToBitmapImage())
+                .ToArray();
+
+            this.NumbersAsSmoothedBinaryImages = new ImagesModel(smoothBitmapImages);
+            //
+            // var thinnedBitmaps = smoothBitmaps
+            //     .Select(ImageProcessor.Thinning)
+            //     .ToArray();
+
+            var thinnedBitmap0 = ImageProcessor.Thinning(ImageProcessor.Thinning(smoothBitmaps[0]));
+            var thinnedBitmap1 = ImageProcessor.Thinning(ImageProcessor.Thinning(thinnedBitmap0));
+            var thinnedBitmap2 = ImageProcessor.Thinning(ImageProcessor.Thinning(thinnedBitmap1));
+            var thinnedBitmap3 = ImageProcessor.Thinning(ImageProcessor.Thinning(thinnedBitmap2));
+            var thinnedBitmap4 = ImageProcessor.Thinning(ImageProcessor.Thinning(thinnedBitmap3));
+            var thinnedBitmap5 = ImageProcessor.Thinning(ImageProcessor.Thinning(thinnedBitmap4));
+            var thinnedBitmap6 = ImageProcessor.Thinning(ImageProcessor.Thinning(thinnedBitmap5));
+            var thinnedBitmap7 = ImageProcessor.Thinning(ImageProcessor.Thinning(thinnedBitmap6));
+            var thinnedBitmap8 = ImageProcessor.Thinning(ImageProcessor.Thinning(thinnedBitmap7));
+            var thinnedBitmap9 = ImageProcessor.Thinning(ImageProcessor.Thinning(thinnedBitmap8));
+
+            var thinnedBitmapImages = new[]
+            {
+                thinnedBitmap0.ToBitmap().ToBitmapImage(),
+                thinnedBitmap1.ToBitmap().ToBitmapImage(),
+                thinnedBitmap2.ToBitmap().ToBitmapImage(),
+                thinnedBitmap3.ToBitmap().ToBitmapImage(),
+                thinnedBitmap4.ToBitmap().ToBitmapImage(),
+                thinnedBitmap5.ToBitmap().ToBitmapImage(),
+                thinnedBitmap6.ToBitmap().ToBitmapImage(),
+                thinnedBitmap7.ToBitmap().ToBitmapImage(),
+                thinnedBitmap8.ToBitmap().ToBitmapImage(),
+                thinnedBitmap9.ToBitmap().ToBitmapImage()
+            };
+
+            this.NumbersAsThinnedBinaryImages = new ImagesModel(thinnedBitmapImages);
         }
 
         public ImagesModel RawNumbers { get; }
 
-        public ImagesModel BlackWhiteNumbers { get; }
-
-        public ImagesModel SharpNumbers { get; }
-
-        private static BitmapImage ToImage(byte[] array)
+        public ImagesModel NumbersAsBinaryImage
         {
-            using var ms = new MemoryStream(array);
-            var image = new BitmapImage();
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad;
-            image.StreamSource = ms;
-            image.EndInit();
-
-            return image;
+            get => this.numbersAsBinaryImage;
+            private set
+            {
+                this.numbersAsBinaryImage = value;
+                this.OnPropertyChanged();
+            }
         }
 
-        private static BitmapImage ToImage(Bitmap bitmap)
+        public ImagesModel NumbersAsSmoothedBinaryImages
         {
-            using var ms = new MemoryStream();
-            bitmap.Save(ms, ImageFormat.Png);
-            ms.Position = 0;
-            var bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.StreamSource = ms;
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.EndInit();
-            bitmapImage.Freeze();
-
-            return bitmapImage;
+            get => this.numbersAsSmoothedBinaryImages;
+            private set
+            {
+                this.numbersAsSmoothedBinaryImages = value;
+                this.OnPropertyChanged();
+            }
         }
 
-        private static Bitmap ToBitmap(BitmapSource bitmapImage)
+        public ImagesModel NumbersAsThinnedBinaryImages
         {
-            using var outStream = new MemoryStream();
-            BitmapEncoder enc = new BmpBitmapEncoder();
-            enc.Frames.Add(BitmapFrame.Create(bitmapImage));
-            enc.Save(outStream);
+            get => this.numbersAsThinnedBinaryImages;
+            private set
+            {
+                this.numbersAsThinnedBinaryImages = value;
+                this.OnPropertyChanged();
+            }
+        }
 
-            return new Bitmap(outStream);
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

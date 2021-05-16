@@ -8,7 +8,7 @@
              Background="White"
              d:DesignHeight="450"
              d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance d:Type={x:Type local:NumbersBySignatureViewModel}}">
+             d:DataContext="{d:DesignInstance d:Type={x:Type local:NumbersBySignatureViewModel}}" Loaded="NumbersBySignatureView_OnLoaded">
     <UserControl.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="Padding" Value="0 7" />
@@ -19,8 +19,10 @@
         <TextBlock Text="These are the raw images of our numbers. To identify the displayed images we will process the following steps one after another." DockPanel.Dock="Top" />
         <local:ImageRowView DockPanel.Dock="Top" DataContext="{Binding RawNumbers}" />
         <TextBlock Text="Step 1: Converting the images to black and white." DockPanel.Dock="Top" />
-        <local:ImageRowView DockPanel.Dock="Top" DataContext="{Binding BlackWhiteNumbers}" />
-        <TextBlock Text="Step 2: Sharpen the image." DockPanel.Dock="Top" />
-        <local:ImageRowView DockPanel.Dock="Top" DataContext="{Binding SharpNumbers}" />
+        <local:ImageRowView DockPanel.Dock="Top" DataContext="{Binding NumbersAsBinaryImage}" />
+        <TextBlock Text="Step 2: Remove noises." DockPanel.Dock="Top" />
+        <local:ImageRowView DockPanel.Dock="Top" DataContext="{Binding NumbersAsSmoothedBinaryImages}" />
+        <TextBlock Text="Step 3: Thin the lines down to one pixel." DockPanel.Dock="Top" />
+        <local:ImageRowView DockPanel.Dock="Top" DataContext="{Binding NumbersAsThinnedBinaryImages}" />
     </DockPanel>
 </UserControl>

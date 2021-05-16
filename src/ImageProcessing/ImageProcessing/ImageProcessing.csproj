@@ -6,7 +6,6 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <Authors>Marko Marković</Authors>
-    <Company>.</Company>
     <Description>Sample application for demonstrating image processing techniques using C# .NET.</Description>
     <Copyright>Marko Marković</Copyright>
     <PackageLicenseExpression>MIT License</PackageLicenseExpression>
@@ -46,6 +45,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ImageResource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ImageProcessingLib\ImageProcessingLib.csproj" />
   </ItemGroup>
 
 </Project>

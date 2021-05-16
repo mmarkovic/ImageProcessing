@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.31105.61
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageProcessing", "ImageProcessing\ImageProcessing.csproj", "{68915AF9-8ED5-4F31-8B39-D033CEAFAD32}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageProcessingLib.Test", "ImageProcessingLib.Test\ImageProcessingLib.Test.csproj", "{D8CCE4FC-10A4-495F-9B29-67A18022BA43}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageProcessingLib", "ImageProcessingLib\ImageProcessingLib.csproj", "{EBFBE625-0BF8-48C2-AD27-AE470A47D43F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{68915AF9-8ED5-4F31-8B39-D033CEAFAD32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68915AF9-8ED5-4F31-8B39-D033CEAFAD32}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68915AF9-8ED5-4F31-8B39-D033CEAFAD32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8CCE4FC-10A4-495F-9B29-67A18022BA43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8CCE4FC-10A4-495F-9B29-67A18022BA43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8CCE4FC-10A4-495F-9B29-67A18022BA43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8CCE4FC-10A4-495F-9B29-67A18022BA43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBFBE625-0BF8-48C2-AD27-AE470A47D43F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBFBE625-0BF8-48C2-AD27-AE470A47D43F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBFBE625-0BF8-48C2-AD27-AE470A47D43F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBFBE625-0BF8-48C2-AD27-AE470A47D43F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
