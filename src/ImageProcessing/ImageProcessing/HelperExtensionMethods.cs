@@ -1,12 +1,28 @@
 ﻿namespace ImageProcessing
 {
+    using System.Collections.Generic;
     using System.Drawing;
     using System.Drawing.Imaging;
     using System.IO;
+    using System.Linq;
     using System.Windows.Media.Imaging;
 
-    public static class BitmapExtensions
+    using ImageProcessingLib;
+
+    public static class HelperExtensionMethods
     {
+        public static Dictionary<int, T> ToIndexedDictionary<T>(this IEnumerable<T> list)
+        {
+            return list
+                .Select((element, index) => new { element, index })
+                .ToDictionary(k => k.index, v => v.element);
+        }
+
+        public static BitmapImage ToBitmapImage(this BinaryImage binaryImage)
+        {
+            return binaryImage.ToBitmap().ToBitmapImage();
+        }
+
         public static BitmapImage ToBitmapImage(this Bitmap bitmap)
         {
             using var ms = new MemoryStream();

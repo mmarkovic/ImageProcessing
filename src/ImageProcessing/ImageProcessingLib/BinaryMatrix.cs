@@ -30,7 +30,7 @@
     {
         private readonly byte[,] value;
 
-        public Size Size => new Size(this.value.GetLength(0), this.value.GetLength(1));
+        public Size Size { get; }
 
         public byte this[int m, int n]
         {
@@ -41,11 +41,13 @@
         public BinaryMatrix(byte[,] value)
         {
             this.value = value;
+            this.Size = new Size(value.GetLength(0), value.GetLength(1));
         }
 
         public BinaryMatrix(Size size)
         {
             this.value = new byte[size.Height, size.Width];
+            this.Size = size;
         }
 
         public static bool operator ==(BinaryMatrix left, BinaryMatrix right)

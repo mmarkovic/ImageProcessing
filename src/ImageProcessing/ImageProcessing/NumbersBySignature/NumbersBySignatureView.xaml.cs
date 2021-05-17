@@ -11,10 +11,12 @@
             this.DataContext = new NumbersBySignatureViewModel();
         }
 
-        private void NumbersBySignatureView_OnLoaded(object sender, RoutedEventArgs e)
+        private async void NumbersBySignatureView_OnLoaded(object sender, RoutedEventArgs e)
         {
-            var viewModel = this.DataContext as NumbersBySignatureViewModel;
-            viewModel?.ProcessImages();
+            if (this.DataContext is NumbersBySignatureViewModel viewModel)
+            {
+                await viewModel.ProcessImagesAsync();
+            }
         }
     }
 }
