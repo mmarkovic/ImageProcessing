@@ -14,15 +14,26 @@
             <Setter Property="Padding" Value="0 7" />
         </Style>
     </UserControl.Resources>
-    <DockPanel Margin="5">
-        <TextBlock Text="Recognize Numbers by Signature" DockPanel.Dock="Top" FontSize="20" />
-        <TextBlock Text="These are the raw images of our numbers. To identify the displayed images we will process the following steps one after another." DockPanel.Dock="Top" />
-        <local:ImageRowView DockPanel.Dock="Top" DataContext="{Binding RawNumbers}" />
-        <TextBlock Text="Step 1: Converting the images to black and white." DockPanel.Dock="Top" />
-        <local:ImageRowView DockPanel.Dock="Top" DataContext="{Binding NumbersAsBinaryImage}" />
-        <TextBlock Text="Step 2: Remove noises." DockPanel.Dock="Top" />
-        <local:ImageRowView DockPanel.Dock="Top" DataContext="{Binding NumbersAsSmoothedBinaryImages}" />
-        <TextBlock Text="Step 3: Thin the lines down to one pixel." DockPanel.Dock="Top" />
-        <local:ImageRowView DockPanel.Dock="Top" DataContext="{Binding NumbersAsThinnedBinaryImages}" />
-    </DockPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="3*" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Recognize Numbers by Signature" FontSize="20" />
+        <TextBlock Grid.Row="1" Text="These are the raw images of our numbers. To identify the displayed images we will process the following steps one after another." />
+        <local:ImageRowView Grid.Row="2" DataContext="{Binding RawNumbers}" />
+        <TextBlock Grid.Row="3" Text="Step 1: Converting the images to black and white." />
+        <local:ImageRowView Grid.Row="4" DataContext="{Binding NumbersAsBinaryImage}" />
+        <TextBlock Grid.Row="5" Text="Step 2: Remove noises." />
+        <local:ImageRowView Grid.Row="6" DockPanel.Dock="Top" DataContext="{Binding NumbersAsSmoothedBinaryImages}" />
+        <TextBlock Grid.Row="7" Text="Step 3: Thin the lines down to one pixel." />
+        <local:ImageRowView Grid.Row="8" DataContext="{Binding NumbersAsThinnedBinaryImages}" />
+    </Grid>
 </UserControl>

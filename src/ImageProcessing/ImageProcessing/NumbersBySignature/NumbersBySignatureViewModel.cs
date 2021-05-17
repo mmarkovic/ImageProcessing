@@ -16,7 +16,7 @@
             this.RawNumbers = new ImagesModel();
             this.NumbersAsBinaryImage = new ImagesModel();
             this.NumbersAsSmoothedBinaryImages = new ImagesModel();
-            this.NumbersAsThinnedBinaryImages = new ImagesModel();
+            this.NumbersAsThinnedBinaryImages = new ImagesModel { DisplayIteration = true };
         }
 
         public async Task ProcessImagesAsync()
@@ -69,12 +69,22 @@
                         kvp =>
                         {
                             return Task.Run(
-                                () =>
+                                async () =>
                                 {
                                     (int index, var binaryImage) = kvp;
-                                    var thinnedImg = ImageProcessor.Thinning(binaryImage);
-                                    this.NumbersAsThinnedBinaryImages[index] = thinnedImg.ToBitmapImage();
-                                    return thinnedImg;
+                                    BinaryImage img = binaryImage;
+                                    for (int i = 0; i < 10; i++)
+                                    {
+                                        img = await Task.Run(
+                                            () =>
+                                            {
+                                                var thinnedImg = ImageProcessor.Thinning(img);
+                                                this.NumbersAsThinnedBinaryImages[index] = thinnedImg.ToBitmapImage();
+                                                this.NumbersAsThinnedBinaryImages.SetProcessingIteration(index, i);
+                                                return thinnedImg;
+                                            });
+                                    }
+                                    return img;
                                 });
                         }));
 

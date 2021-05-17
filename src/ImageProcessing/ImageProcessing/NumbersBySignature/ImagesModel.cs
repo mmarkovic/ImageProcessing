@@ -2,13 +2,10 @@
 {
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Windows.Media.Imaging;
 
     using Annotations;
-
-    using ImageProcessingLib;
 
     /// <summary>
     /// Contains all images of the numbers (0-9) for processing.
@@ -16,12 +13,16 @@
     public class ImagesModel : INotifyPropertyChanged
     {
         private readonly BitmapImage[] numberImages;
+        private readonly int[] processingIteration;
+
+        private bool displayIteration;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ImagesModel()
         {
             this.numberImages = new BitmapImage[10];
+            this.processingIteration = new int[10];
         }
 
         public BitmapImage this[int index]
@@ -34,9 +35,14 @@
             }
         }
 
-        public ImagesModel(IEnumerable<BitmapImage> numberImages)
+        public bool DisplayIteration
         {
-            this.numberImages = numberImages.ToArray();
+            get => this.displayIteration;
+            set
+            {
+                this.displayIteration = value;
+                this.OnPropertyChanged();
+            }
         }
 
         public BitmapImage Number0Image
@@ -139,9 +145,26 @@
             }
         }
 
-        public IReadOnlyList<BitmapImage> GetImages()
+        public int Number0ProcessingIteration => this.processingIteration[0];
+        public int Number1ProcessingIteration => this.processingIteration[1];
+        public int Number2ProcessingIteration => this.processingIteration[2];
+        public int Number3ProcessingIteration => this.processingIteration[3];
+        public int Number4ProcessingIteration => this.processingIteration[4];
+        public int Number5ProcessingIteration => this.processingIteration[5];
+        public int Number6ProcessingIteration => this.processingIteration[6];
+        public int Number7ProcessingIteration => this.processingIteration[7];
+        public int Number8ProcessingIteration => this.processingIteration[8];
+        public int Number9ProcessingIteration => this.processingIteration[9];
+
+        public IEnumerable<BitmapImage> GetImages()
         {
             return this.numberImages;
+        }
+
+        public void SetProcessingIteration(int imageIndex, int iteration)
+        {
+            this.processingIteration[imageIndex] = iteration;
+            this.OnPropertyChanged($"Number{imageIndex}ProcessingIteration");
         }
 
         [NotifyPropertyChangedInvocator]
