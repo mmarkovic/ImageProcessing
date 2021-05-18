@@ -143,6 +143,11 @@
             return true;
         }
 
+        public static BinaryImage CropAroundFigures(BinaryImage binaryImage)
+        {
+            return Cropper.CropAroundFigures(binaryImage);
+        }
+
         /// <summary>
         /// Calculates the average value of the center of the <paramref name="matrixValues"/>.
         /// </summary>

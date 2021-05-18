@@ -31,7 +31,7 @@
 
         private readonly byte[,] image;
 
-        public Size Size => new Size(this.image.GetLength(1), this.image.GetLength(0));
+        public Size Size { get; }
 
         public byte this[int m, int n]
         {
@@ -39,9 +39,16 @@
             set => this.image[m, n] = value;
         }
 
+        public BinaryImage(int width, int height)
+        {
+            this.image = new byte[height, width];
+            this.Size = new Size(width, height);
+        }
+
         private BinaryImage(byte[,] image)
         {
             this.image = image;
+            this.Size = new Size(image.GetLength(1), image.GetLength(0));
         }
 
         public static bool operator ==(BinaryImage left, BinaryImage right)
