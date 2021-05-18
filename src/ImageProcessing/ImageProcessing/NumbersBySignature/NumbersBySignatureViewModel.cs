@@ -16,6 +16,7 @@
             this.RawNumbers = new ImagesModel();
             this.NumbersAsBinaryImage = new ImagesModel();
             this.CroppedBinaryImages = new ImagesModel();
+            this.DownSizedBinaryImages = new ImagesModel();
             this.NumbersAsSmoothedBinaryImages = new ImagesModel();
             this.NumbersAsThinnedBinaryImages = new ImagesModel { DisplayIteration = true };
         }
@@ -25,7 +26,8 @@
             var rawBitmapImages = this.LoadImages();
             var binaryImages = await this.ProcessImagesToBinaryImagesAsync(rawBitmapImages);
             var croppedImages = await this.CropImagesAsync(binaryImages);
-            var smoothedImages = await this.ApplySmoothingAsync(croppedImages);
+            var downSizedImages = await this.DownSizeImagesAsync(croppedImages);
+            var smoothedImages = await this.ApplySmoothingAsync(downSizedImages);
             await this.ApplyThinningAsync(smoothedImages);
         }
 
@@ -34,6 +36,8 @@
         public ImagesModel NumbersAsBinaryImage { get; }
 
         public ImagesModel CroppedBinaryImages { get; }
+
+        public ImagesModel DownSizedBinaryImages { get; }
 
         public ImagesModel NumbersAsSmoothedBinaryImages { get; }
 
@@ -105,6 +109,28 @@
                         }));
 
             return croppedImages;
+        }
+
+        private async Task<BinaryImage[]> DownSizeImagesAsync(IEnumerable<BinaryImage> binaryImages)
+        {
+            var binaryImagesDict = binaryImages.ToIndexedDictionary();
+
+            var downSizedImages = await Task.WhenAll(
+                binaryImagesDict
+                    .Select(
+                        kvp =>
+                        {
+                            return Task.Run(
+                                () =>
+                                {
+                                    (int index, var binaryImage) = kvp;
+                                    var thinnedImg = ImageProcessor.DownSizeToHalf(binaryImage);
+                                    this.DownSizedBinaryImages[index] = thinnedImg.ToBitmapImage();
+                                    return thinnedImg;
+                                });
+                        }));
+
+            return downSizedImages;
         }
 
         private async Task<BinaryImage[]> ApplySmoothingAsync(IEnumerable<BinaryImage> binaryImages)

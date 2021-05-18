@@ -91,5 +91,25 @@
 
             result.Should().Be(Expected);
         }
+
+        [Fact]
+        public void GetNeighbourMatrixFromPosition()
+        {
+            var sampleImage = BinaryImage.FromByteArray(
+                new byte[,]
+                {
+                    { 0, 0, 0, 0, 0, 0 },
+                    { 0, 1, 1, 1, 1, 0 },
+                    { 0, 1, 1, 1, 1, 0 },
+                    { 0, 1, 1, 1, 1, 0 },
+                    { 0, 1, 1, 1, 1, 0 },
+                    { 0, 0, 0, 0, 0, 0 },
+                });
+
+            sampleImage.GetNeighbourMatrixFromPosition(0, 0, 2).ToString().Should().Be("00\r\n01");
+            sampleImage.GetNeighbourMatrixFromPosition(1, 0, 2).ToString().Should().Be("01\r\n01");
+            sampleImage.GetNeighbourMatrixFromPosition(0, 1, 2).ToString().Should().Be("00\r\n11");
+            sampleImage.GetNeighbourMatrixFromPosition(1, 1, 2).ToString().Should().Be("11\r\n11");
+        }
     }
 }

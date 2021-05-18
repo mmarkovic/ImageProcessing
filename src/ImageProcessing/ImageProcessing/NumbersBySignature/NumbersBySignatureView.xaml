@@ -26,6 +26,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="3*" />
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Text="Recognize Numbers by Signature" FontSize="20" />
@@ -35,9 +37,11 @@
         <local:ImageRowView Grid.Row="4" DataContext="{Binding NumbersAsBinaryImage}" />
         <TextBlock Grid.Row="5" Text="Step 2: Crop images." />
         <local:ImageRowView Grid.Row="6"  DataContext="{Binding CroppedBinaryImages}" />
-        <TextBlock Grid.Row="7" Text="Step 3: Remove noises." />
-        <local:ImageRowView Grid.Row="8"  DataContext="{Binding NumbersAsSmoothedBinaryImages}" />
-        <TextBlock Grid.Row="9" Text="Step 4: Thin the lines down to one pixel." />
-        <local:ImageRowView Grid.Row="10" DataContext="{Binding NumbersAsThinnedBinaryImages}" />
+        <TextBlock Grid.Row="7" Text="Step 3: Shrink images." />
+        <local:ImageRowView Grid.Row="8" DataContext="{Binding DownSizedBinaryImages}" />
+        <TextBlock Grid.Row="9" Text="Step 4: Remove noises." />
+        <local:ImageRowView Grid.Row="10" DataContext="{Binding NumbersAsSmoothedBinaryImages}" />
+        <TextBlock Grid.Row="11" Text="Step 5: Thin the lines down to one pixel." />
+        <local:ImageRowView Grid.Row="12" DataContext="{Binding NumbersAsThinnedBinaryImages}" />
     </Grid>
 </UserControl>

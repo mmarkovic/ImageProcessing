@@ -158,6 +158,13 @@
             return bmp;
         }
 
+        public BinaryMatrix GetNeighbourMatrixFromPosition(int m, int n, int matrixSize)
+        {
+            return this.GetNeighbourMatrixFromPosition(
+                new MatrixPosition(m, n),
+                new Size(matrixSize, matrixSize));
+        }
+
         /// <summary>
         /// Gets the neighbour matrix from the position <paramref name="positionInImage"/> from the image.
         /// The size of the neighbour matrix is defined by <paramref name="matrixSize"/>.
@@ -181,8 +188,8 @@
         public BinaryMatrix GetNeighbourMatrixFromPosition(MatrixPosition positionInImage, Size matrixSize)
         {
             var neighbourMatrix = new BinaryMatrix(matrixSize);
-            int fromLeftEdgeToCenterOffset = matrixSize.Width / 2;
-            int fromTopEdgeToCenterOffset = matrixSize.Height / 2;
+            int fromLeftEdgeToCenterOffset = matrixSize.Width > 2 ? matrixSize.Width / 2 : 0;
+            int fromTopEdgeToCenterOffset = matrixSize.Height > 2 ? matrixSize.Height / 2 : 0;
 
             for (var m = 0; m < matrixSize.Height; m++)
             {

@@ -124,9 +124,42 @@
             return this.value.GetHashCode();
         }
 
+        /// <summary>
+        /// Calculates the average values of the current matrix.
+        /// </summary>
+        /// <example>
+        /// <![CDATA[
+        /// 1 1 1 1 0
+        /// 1 1 1 1 0
+        /// 1 1 1 0 0
+        /// 1 1 0 0 0
+        /// 1 0 0 0 0
+        ///
+        /// number of values = 5 * 5 = 25
+        /// sum = 4+4+3+2+1= 14
+        /// average = 14 / 25 = 0.56
+        /// ]]>
+        /// </example>
+        public float GetAverageValue()
+        {
+            var sum = 0;
+
+            for (var m = 0; m < this.Size.Height; m++)
+            {
+                for (var n = 0; n < this.Size.Width; n++)
+                {
+                    sum += this.value[m, n];
+                }
+            }
+
+            int numberOfValues = this.Size.Height * this.Size.Width;
+
+            return sum / (float)numberOfValues;
+        }
+
         public override string ToString()
         {
-            const int MaxCharactersToPrint = 20;
+            const int MaxCharactersToPrint = 50;
             var numberOfCharactersPrinted = 0;
 
             var stringBuilder = new StringBuilder();

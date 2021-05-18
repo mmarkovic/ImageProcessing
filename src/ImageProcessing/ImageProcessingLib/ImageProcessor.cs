@@ -45,7 +45,7 @@
                             }
                         }
 
-                        float average = AverageValueInBinaryMatrix(matrixColors);
+                        float average = matrixColors.GetAverageValue();
 
                         img[m, n] = average >= 0.5f ? BinaryImage.Black : BinaryImage.White;
                     }
@@ -148,37 +148,9 @@
             return Cropper.CropAroundFigures(binaryImage);
         }
 
-        /// <summary>
-        /// Calculates the average value of the center of the <paramref name="matrixValues"/>.
-        /// </summary>
-        /// <example> 
-        /// <![CDATA[
-        /// 1 1 1 1 0
-        /// 1 1 1 1 0
-        /// 1 1 1 0 0
-        /// 1 1 0 0 0
-        /// 1 0 0 0 0
-        ///
-        /// number of values = 5 * 5 = 25
-        /// sum = 4+4+3+2+1= 14
-        /// average = 14 / 25 = 0.56
-        /// ]]>
-        /// </example>
-        private static float AverageValueInBinaryMatrix(BinaryMatrix matrixValues)
+        public static BinaryImage DownSizeToHalf(BinaryImage binaryImage)
         {
-            var sum = 0;
-
-            for (var m = 0; m < matrixValues.Size.Height; m++)
-            {
-                for (var n = 0; n < matrixValues.Size.Width; n++)
-                {
-                    sum += matrixValues[m, n];
-                }
-            }
-
-            int numberOfValues = matrixValues.Size.Height * matrixValues.Size.Width;
-
-            return sum / (float)numberOfValues;
+            return Shrinker.ShrinkByHalf(binaryImage);
         }
     }
 }
