@@ -18,6 +18,10 @@ These are the images with the numbers in their unprocessed from.
 ![6](./doc/1-number-by-signature/6.jpg) | ![7](./doc/1-number-by-signature/7.jpg) | ![8](./doc/1-number-by-signature/8.jpg) | ![9](./doc/1-number-by-signature/9.jpg) | ![0](./doc/1-number-by-signature/0.jpg)
 
 
+After applying different processing steps this is the result so far.
+
+![result](./doc/1-processing-steps.png)
+
 ## Remarks
 
 ### Image Icon
