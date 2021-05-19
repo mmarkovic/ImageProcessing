@@ -1,5 +1,6 @@
 ﻿namespace ImageProcessing.NumbersBySignature
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -43,6 +44,50 @@
 
         public ImagesModel NumbersAsThinnedBinaryImages { get; }
 
+        private static async Task<BinaryImage[]> ExecuteFunctionOnImagesAsync<T>(
+            IEnumerable<T> images,
+            Func<int, T, BinaryImage> processingFunction)
+        {
+            var binaryImagesDict = images.ToIndexedDictionary();
+
+            var processedImages = await Task.WhenAll(
+                binaryImagesDict
+                    .Select(
+                        kvp =>
+                        {
+                            return Task.Run(
+                                () =>
+                                {
+                                    (int index, T binaryImage) = kvp;
+                                    return processingFunction(index, binaryImage);
+                                });
+                        }));
+
+            return processedImages;
+        }
+
+        private static async Task<BinaryImage[]> ExecuteFunctionOnImagesAsync(
+            IEnumerable<BinaryImage> binaryImages,
+            Func<int, BinaryImage, Task<BinaryImage>> processingFunctionAsync)
+        {
+            var binaryImagesDict = binaryImages.ToIndexedDictionary();
+
+            var processedImages = await Task.WhenAll(
+                binaryImagesDict
+                    .Select(
+                        kvp =>
+                        {
+                            return Task.Run(
+                                async () =>
+                                {
+                                    (int index, BinaryImage binaryImage) = kvp;
+                                    return await processingFunctionAsync(index, binaryImage);
+                                });
+                        }));
+
+            return processedImages;
+        }
+
         private BitmapImage[] LoadImages()
         {
             var rawImages = new List<byte[]>
@@ -69,123 +114,83 @@
 
         private async Task<BinaryImage[]> ProcessImagesToBinaryImagesAsync(IEnumerable<BitmapImage> bitmapImages)
         {
-            var binaryImagesDict = bitmapImages.ToIndexedDictionary();
+            BinaryImage ConvertingFunction(int index, BitmapImage bitmapImage)
+            {
+                var processedImage = BinaryImage.FromImage(bitmapImage.ToBitmap());
+                this.NumbersAsBinaryImage[index] = processedImage.ToBitmapImage();
+                return processedImage;
+            }
 
-            var binaryImages = await Task.WhenAll(
-                binaryImagesDict
-                    .Select(
-                        kvp =>
-                        {
-                            return Task.Run(
-                                () =>
-                                {
-                                    (int index, var bitmapImage) = kvp;
-                                    var binaryImage = BinaryImage.FromImage(bitmapImage.ToBitmap());
-                                    this.NumbersAsBinaryImage[index] = binaryImage.ToBitmapImage();
-                                    return binaryImage;
-                                });
-                        }));
-
-            return binaryImages;
+            return await ExecuteFunctionOnImagesAsync(
+                bitmapImages,
+                ConvertingFunction);
         }
 
         private async Task<BinaryImage[]> CropImagesAsync(IEnumerable<BinaryImage> binaryImages)
         {
-            var binaryImagesDict = binaryImages.ToIndexedDictionary();
+            BinaryImage CroppingFunction(int index, BinaryImage binaryImage)
+            {
+                var processedImage = ImageProcessor.CropAroundFigures(binaryImage);
+                this.CroppedBinaryImages[index] = processedImage.ToBitmapImage();
+                return processedImage;
+            }
 
-            var croppedImages = await Task.WhenAll(
-                binaryImagesDict
-                    .Select(
-                        kvp =>
-                        {
-                            return Task.Run(
-                                () =>
-                                {
-                                    (int index, var binaryImage) = kvp;
-                                    var thinnedImg = ImageProcessor.CropAroundFigures(binaryImage);
-                                    this.CroppedBinaryImages[index] = thinnedImg.ToBitmapImage();
-                                    return thinnedImg;
-                                });
-                        }));
-
-            return croppedImages;
+            return await ExecuteFunctionOnImagesAsync(
+                binaryImages,
+                CroppingFunction);
         }
 
         private async Task<BinaryImage[]> DownSizeImagesAsync(IEnumerable<BinaryImage> binaryImages)
         {
-            var binaryImagesDict = binaryImages.ToIndexedDictionary();
+            BinaryImage ShrinkingFunction(int index, BinaryImage binaryImage)
+            {
+                var processedImage = ImageProcessor.DownSizeToHalf(binaryImage);
+                this.DownSizedBinaryImages[index] = processedImage.ToBitmapImage();
+                return processedImage;
+            }
 
-            var downSizedImages = await Task.WhenAll(
-                binaryImagesDict
-                    .Select(
-                        kvp =>
-                        {
-                            return Task.Run(
-                                () =>
-                                {
-                                    (int index, var binaryImage) = kvp;
-                                    var thinnedImg = ImageProcessor.DownSizeToHalf(binaryImage);
-                                    this.DownSizedBinaryImages[index] = thinnedImg.ToBitmapImage();
-                                    return thinnedImg;
-                                });
-                        }));
-
-            return downSizedImages;
+            return await ExecuteFunctionOnImagesAsync(
+                binaryImages,
+                ShrinkingFunction);
         }
 
         private async Task<BinaryImage[]> ApplySmoothingAsync(IEnumerable<BinaryImage> binaryImages)
         {
-            var binaryImagesDict = binaryImages.ToIndexedDictionary();
+            BinaryImage SmoothingFunction(int index, BinaryImage binaryImage)
+            {
+                var processedImage = ImageProcessor.Smoothing(binaryImage);
+                this.NumbersAsSmoothedBinaryImages[index] = processedImage.ToBitmapImage();
+                return processedImage;
+            }
 
-            var smoothedImages = await Task.WhenAll(
-                binaryImagesDict
-                    .Select(
-                        kvp =>
-                        {
-                            return Task.Run(
-                                () =>
-                                {
-                                    (int index, var binaryImage) = kvp;
-                                    var thinnedImg = ImageProcessor.Smoothing(binaryImage);
-                                    this.NumbersAsSmoothedBinaryImages[index] = thinnedImg.ToBitmapImage();
-                                    return thinnedImg;
-                                });
-                        }));
-
-            return smoothedImages;
+            return await ExecuteFunctionOnImagesAsync(
+                binaryImages,
+                SmoothingFunction);
         }
 
         private async Task<BinaryImage[]> ApplyThinningAsync(IEnumerable<BinaryImage> binaryImages)
         {
-            var binaryImagesDict = binaryImages.ToIndexedDictionary();
-
-            var thinnedBitmapImages = await Task.WhenAll(
-                binaryImagesDict
-                    .Select(
-                        kvp =>
+            async Task<BinaryImage> ThinningFunctionAsync(int index, BinaryImage binaryImage)
+            {
+                BinaryImage img = binaryImage;
+                for (int i = 0; i < 10; i++)
+                {
+                    img = await Task.Run(
+                        () =>
                         {
-                            return Task.Run(
-                                async () =>
-                                {
-                                    (int index, var binaryImage) = kvp;
-                                    BinaryImage img = binaryImage;
-                                    for (int i = 0; i < 10; i++)
-                                    {
-                                        img = await Task.Run(
-                                            () =>
-                                            {
-                                                var thinnedImg = ImageProcessor.Thinning(img);
-                                                this.NumbersAsThinnedBinaryImages[index] = thinnedImg.ToBitmapImage();
-                                                this.NumbersAsThinnedBinaryImages.SetProcessingIteration(index, i);
-                                                return thinnedImg;
-                                            });
-                                    }
+                            var thinnedImg = ImageProcessor.Thinning(img);
+                            this.NumbersAsThinnedBinaryImages[index] = thinnedImg.ToBitmapImage();
+                            this.NumbersAsThinnedBinaryImages.SetProcessingIteration(index, i);
+                            return thinnedImg;
+                        });
+                }
 
-                                    return img;
-                                });
-                        }));
+                return img;
+            }
 
-            return thinnedBitmapImages;
+            return await ExecuteFunctionOnImagesAsync(
+                binaryImages,
+                ThinningFunctionAsync);
         }
     }
 }
