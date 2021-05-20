@@ -41,7 +41,7 @@
         public BinaryMatrix(byte[,] value)
         {
             this.value = value;
-            this.Size = new Size(value.GetLength(0), value.GetLength(1));
+            this.Size = new Size(value.GetLength(1), value.GetLength(0));
         }
 
         public BinaryMatrix(Size size)
@@ -159,7 +159,7 @@
 
         public override string ToString()
         {
-            const int MaxCharactersToPrint = 50;
+            const int MaxCharactersToPrint = 100;
             var numberOfCharactersPrinted = 0;
 
             var stringBuilder = new StringBuilder();

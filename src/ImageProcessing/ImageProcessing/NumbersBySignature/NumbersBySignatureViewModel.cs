@@ -173,7 +173,8 @@
             async Task<BinaryImage> ThinningFunctionAsync(int index, BinaryImage binaryImage)
             {
                 BinaryImage img = binaryImage;
-                for (int i = 0; i < 10; i++)
+                BinaryImage previousImg = binaryImage;
+                for (int i = 0; i < 35; i++)
                 {
                     img = await Task.Run(
                         () =>
@@ -183,6 +184,14 @@
                             this.NumbersAsThinnedBinaryImages.SetProcessingIteration(index, i);
                             return thinnedImg;
                         });
+
+                    if (img.Equals(previousImg))
+                    {
+                        // no changes after last thinning -> abort
+                        return img;
+                    }
+
+                    previousImg = img;
                 }
 
                 return img;

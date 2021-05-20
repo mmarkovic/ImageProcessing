@@ -54,95 +54,6 @@
             return img;
         }
 
-        /// <remarks>
-        /// source: https://homepages.inf.ed.ac.uk/rbf/HIPR2/thin.htm
-        /// </remarks>
-        public static BinaryImage Thinning(BinaryImage binaryImage)
-        {
-            // 0 stands for white
-            // 1 stands for black
-            // -1 will be ignored
-            var structuringElementB1 = new StructuringElement(new[,] { { 0, 0, 0 }, { -1, 1, -1 }, { 1, 1, 1 } });
-            var structuringElementB2 = new StructuringElement(new[,] { { -1, 0, 0 }, { 1, 1, 0 }, { 1, 1, -1 } });
-            var structuringElementB3 = new StructuringElement(new[,] { { 1, -1, 0 }, { 1, 1, 0 }, { 1, -1, 0 } });
-            var structuringElementB4 = new StructuringElement(new[,] { { 1, 1, -1 }, { 1, 1, 0 }, { -1, 0, 0 } });
-            var structuringElementB5 = new StructuringElement(new[,] { { 1, 1, 1 }, { -1, 1, -1 }, { 0, 0, 0 } });
-            var structuringElementB6 = new StructuringElement(new[,] { { -1, 1, 1 }, { 0, 1, 1 }, { 0, 0, -1 } });
-            var structuringElementB7 = new StructuringElement(new[,] { { 0, -1, 1 }, { 0, 1, 1 }, { 0, -1, 1 } });
-            var structuringElementB8 = new StructuringElement(new[,] { { 0, 0, -1 }, { 0, 1, 1 }, { -1, 1, 1 } });
-
-            var structuringElements = new[]
-            {
-                structuringElementB1,
-                structuringElementB2,
-                structuringElementB3,
-                structuringElementB4,
-                structuringElementB5,
-                structuringElementB6,
-                structuringElementB7,
-                structuringElementB8
-            };
-
-            return Thinning(
-                binaryImage,
-                structuringElements);
-        }
-
-        public static BinaryImage Thinning(BinaryImage binaryImage, IEnumerable<StructuringElement> structuringElements)
-        {
-            var thinnedImage = binaryImage;
-
-            foreach (var structuringElement in structuringElements)
-            {
-                var hitAndMissImg = thinnedImage.Clone();
-
-                Parallel.For(
-                    0,
-                    hitAndMissImg.Size.Height,
-                    m =>
-                    {
-                        for (var n = 0; n < hitAndMissImg.Size.Width; n++)
-                        {
-                            var positionInImage = new MatrixPosition(m, n);
-                            var neighbourMatrix = binaryImage.GetNeighbourMatrixFromPosition(
-                                positionInImage,
-                                structuringElement.Size);
-
-                            bool match = MatchMatrixToStructuringElement(neighbourMatrix, structuringElement);
-                            if (match)
-                            {
-                                hitAndMissImg[m, n] = BinaryImage.White;
-                            }
-                        }
-                    });
-
-                thinnedImage = hitAndMissImg;
-            }
-
-            return thinnedImage;
-        }
-
-        public static bool MatchMatrixToStructuringElement(BinaryMatrix matrix, StructuringElement structuringElement)
-        {
-            for (var m = 0; m < matrix.Size.Height; m++)
-            {
-                for (var n = 0; n < matrix.Size.Width; n++)
-                {
-                    if (structuringElement[m, n] == -1)
-                    {
-                        continue;
-                    }
-
-                    if (structuringElement[m, n] != matrix[m, n])
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
         public static BinaryImage CropAroundFigures(BinaryImage binaryImage)
         {
             return Cropper.CropAroundFigures(binaryImage);
@@ -151,6 +62,11 @@
         public static BinaryImage DownSizeToHalf(BinaryImage binaryImage)
         {
             return Shrinker.ShrinkByHalf(binaryImage);
+        }
+
+        public static BinaryImage Thinning(BinaryImage binaryImage)
+        {
+            return Thinner.Thinning(binaryImage);
         }
     }
 }

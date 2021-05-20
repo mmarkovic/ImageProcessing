@@ -9,65 +9,6 @@ namespace ImageProcessingLib
 
     public class ImageProcessorTest
     {
-        [Fact]
-        public void MatchesMatrixToStructuringElement()
-        {
-            var structuringElement = new StructuringElement(
-                new[,]
-                {
-                    { 0, 0, 0 },
-                    { -1, -1, -1 },
-                    { 1, 1, 1 }
-                });
-
-            var matchingMatrix = new BinaryMatrix(
-                new byte[,]
-                {
-                    { 0, 0, 0 },
-                    { 1, 0, 0 },
-                    { 1, 1, 1 }
-                });
-
-            bool result = ImageProcessor.MatchMatrixToStructuringElement(
-                matchingMatrix,
-                structuringElement);
-
-            result.Should().BeTrue();
-        }
-
-        [Fact]
-        public void AppliesThinningOnImage()
-        {
-            var structuringElement = new StructuringElement(
-                new[,]
-                {
-                    { 0, 0, -1 },
-                    { 1, 1, -1 },
-                    { -1, -1, -1 }
-                });
-
-            var inputImage = BinaryImage.FromByteArray(
-                new byte[,]
-                {
-                    { 0, 0, 0 },
-                    { 1, 1, 1 },
-                    { 1, 1, 1 }
-                });
-
-            var expected = BinaryImage.FromByteArray(
-                new byte[,]
-                {
-                    { 0, 0, 0 },
-                    { 0, 1, 1 },
-                    { 0, 0, 0 }
-                });
-
-            var structuringElements = new []{ structuringElement };
-            var result = ImageProcessor.Thinning(inputImage, structuringElements);
-            result.Should().Be(
-                expected,
-                $"result:\r\n{result.ToMatrixString()}\r\n should be as expected:\r\n{expected.ToMatrixString()}");
-        }
 
         [Theory]
         [MemberData(nameof(NeighbourMatrixTestData))]

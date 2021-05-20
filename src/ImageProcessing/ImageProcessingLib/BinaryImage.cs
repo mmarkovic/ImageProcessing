@@ -227,7 +227,7 @@
             return other switch
             {
                 null => false,
-                _ => ReferenceEquals(this, other) || this.image.Equals(other.image)
+                _ => ReferenceEquals(this, other) || this.image.IsSequenceEqualTo(other.image)
             };
         }
 
