@@ -350,3 +350,4 @@ MigrationBackup/
 .ionide/
 desktop.ini
 src/ImageProcessing/.idea
+*/.idea

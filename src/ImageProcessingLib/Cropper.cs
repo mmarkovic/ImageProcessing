@@ -27,15 +27,15 @@
 
         public static BinaryImage CropAroundFigures(BinaryImage binaryImage)
         {
-            int topPixelRowMWithOffset = FindTopMostPixelIn(binaryImage) - CroppingOffset;
+            int topPixelRowMWithOffset = binaryImage.FindTopMostPixelPosition() - CroppingOffset;
             if (topPixelRowMWithOffset == -1)
             {
                 return binaryImage;
             }
 
-            int bottomPixelRowMWithOffset = FindBottomLinePixelIn(binaryImage) + CroppingOffset;
-            int leftPixelColumnNWithOffset = FindLeftMostPixelIn(binaryImage) - CroppingOffset;
-            int rightPixelColumnNWithOffset = FindRightMostPixelIn(binaryImage) + CroppingOffset;
+            int bottomPixelRowMWithOffset = binaryImage.FindBottomLinePixelIn() + CroppingOffset;
+            int leftPixelColumnNWithOffset = binaryImage.FindLeftMostPixelIn() - CroppingOffset;
+            int rightPixelColumnNWithOffset = binaryImage.FindRightMostPixelIn() + CroppingOffset;
 
             int newTopM = topPixelRowMWithOffset > 0 ? topPixelRowMWithOffset : 0;
             int newBottomM = bottomPixelRowMWithOffset < binaryImage.Size.Height - 1
@@ -64,70 +64,6 @@
             }
 
             return croppedImage;
-        }
-
-        private static int FindTopMostPixelIn(BinaryImage binaryImage)
-        {
-            for (int m = 0; m < binaryImage.Size.Height; m++)
-            {
-                for (int n = 0; n < binaryImage.Size.Width; n++)
-                {
-                    if (binaryImage[m, n] == BinaryImage.Black)
-                    {
-                        return m;
-                    }
-                }
-            }
-
-            return -1;
-        }
-
-        private static int FindBottomLinePixelIn(BinaryImage binaryImage)
-        {
-            for (int m = binaryImage.Size.Height - 1; m >= 0; m--)
-            {
-                for (int n = 0; n < binaryImage.Size.Width; n++)
-                {
-                    if (binaryImage[m, n] == BinaryImage.Black)
-                    {
-                        return m;
-                    }
-                }
-            }
-
-            return -1;
-        }
-
-        private static int FindLeftMostPixelIn(BinaryImage binaryImage)
-        {
-            for (int n = 0; n < binaryImage.Size.Width; n++)
-            {
-                for (int m = 0; m < binaryImage.Size.Height; m++)
-                {
-                    if (binaryImage[m, n] == BinaryImage.Black)
-                    {
-                        return n;
-                    }
-                }
-            }
-
-            return -1;
-        }
-
-        private static int FindRightMostPixelIn(BinaryImage binaryImage)
-        {
-            for (int n = binaryImage.Size.Width - 1; n >= 0; n--)
-            {
-                for (int m = 0; m < binaryImage.Size.Height; m++)
-                {
-                    if (binaryImage[m, n] == BinaryImage.Black)
-                    {
-                        return n;
-                    }
-                }
-            }
-
-            return -1;
         }
     }
 }

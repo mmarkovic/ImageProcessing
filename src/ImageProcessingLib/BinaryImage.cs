@@ -217,6 +217,82 @@
             return neighbourMatrix;
         }
 
+        /// <summary>
+        /// Gets the n coordinate of the left most pixel in the image; otherwise -1.
+        /// </summary>
+        public int FindLeftMostPixelIn()
+        {
+            for (int n = 0; n < this.Size.Width; n++)
+            {
+                for (int m = 0; m < this.Size.Height; m++)
+                {
+                    if (this.image[m, n] == Black)
+                    {
+                        return n;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Gets the m coordinate of the top most pixel in the image; otherwise -1.
+        /// </summary>
+        public int FindTopMostPixelPosition()
+        {
+            for (int m = 0; m < this.Size.Height; m++)
+            {
+                for (int n = 0; n < this.Size.Width; n++)
+                {
+                    if (this.image[m, n] == Black)
+                    {
+                        return m;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Gets the n coordinate of the right most pixel in the image; otherwise -1.
+        /// </summary>
+        public int FindRightMostPixelIn()
+        {
+            for (int n = this.Size.Width - 1; n >= 0; n--)
+            {
+                for (int m = 0; m < this.Size.Height; m++)
+                {
+                    if (this.image[m, n] == Black)
+                    {
+                        return n;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Gets the m coordinate of the bottom most pixel in the image; otherwise -1.
+        /// </summary>
+        public int FindBottomLinePixelIn()
+        {
+            for (int m = this.Size.Height - 1; m >= 0; m--)
+            {
+                for (int n = 0; n < this.Size.Width; n++)
+                {
+                    if (this.image[m, n] == Black)
+                    {
+                        return m;
+                    }
+                }
+            }
+
+            return -1;
+        }
+
         public string ToMatrixString()
         {
             return new BinaryMatrix(this.image).ToString();
