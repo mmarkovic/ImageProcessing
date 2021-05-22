@@ -9,7 +9,6 @@ namespace ImageProcessingLib
 
     public class ImageProcessorTest
     {
-
         [Theory]
         [MemberData(nameof(NeighbourMatrixTestData))]
         public void GetsNeighbourMatrixFromPosition(

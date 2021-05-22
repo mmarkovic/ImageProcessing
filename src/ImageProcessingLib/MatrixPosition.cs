@@ -1,5 +1,7 @@
 ﻿namespace ImageProcessingLib
 {
+    using System;
+
     /// <summary>
     /// Represents a position in a matrix.
     /// </summary>
@@ -19,7 +21,7 @@
     ///  y, m (zero based row index)
     /// ]]>
     /// </remarks>
-    public class MatrixPosition
+    public class MatrixPosition : IEquatable<MatrixPosition>
     {
         public MatrixPosition(int m, int n)
         {
@@ -37,9 +39,44 @@
         /// </summary>
         public int N { get; }
 
+        public static bool operator ==(MatrixPosition left, MatrixPosition right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(MatrixPosition left, MatrixPosition right)
+        {
+            return !Equals(left, right);
+        }
+
         public override string ToString()
         {
             return $"[{this.M},{this.N}]";
+        }
+
+        public bool Equals(MatrixPosition other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+
+            return this.M == other.M && this.N == other.N;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            return obj.GetType() == this.GetType() && this.Equals((MatrixPosition)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(this.M, this.N);
         }
     }
 }

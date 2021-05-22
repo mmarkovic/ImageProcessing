@@ -39,6 +39,12 @@
             set => this.image[m, n] = value;
         }
 
+        public byte this[MatrixPosition position]
+        {
+            get => this.image[position.M, position.N];
+            set => this.image[position.M, position.N] = value;
+        }
+
         public BinaryImage(int width, int height)
         {
             this.image = new byte[height, width];

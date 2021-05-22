@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// Get's the signature of an object in an image.
@@ -67,12 +68,12 @@
 
             var center = GetCenterOfObjectIn(image);
 
-            for (int samplingPoint = 0; samplingPoint < 16; samplingPoint++)
+            for (int samplingPoint = 0; samplingPoint < numberOfSamplingPoints; samplingPoint++)
             {
                 // value of the angle, at which the sampling from the center will be taken.
                 int angle = samplingPoint * angleIncrement;
 
-                List<int> pointsInAngle = FindAllPointFromCenterInAngle(image, center, angle);
+                int[] pointsInAngle = FindAllPointsFromCenterInAngle(image, center, angle).ToArray();
 
                 points.Add(samplingPoint, pointsInAngle);
             }
@@ -97,9 +98,48 @@
         }
 
         /// <summary>
+        /// Returns the coordinates of the pixels that lie on the line, which is defined by the
+        /// <paramref name="startingPosition"/> and its <paramref name="angle"/> to the edge of the
+        /// <paramref name="image"/>. The <paramref name="startingPosition"/> will not be returned in the
+        /// result set.
+        /// </summary>
+        internal static IReadOnlyList<PointOfInterest> GetAllCoordinatesFromStartingPointToEdgeInAngle(
+            BinaryImage image,
+            MatrixPosition startingPosition,
+            int angle)
+        {
+            const int MaxIterationLimit = 50000;
+
+            var pointCoordinates = new List<PointOfInterest>();
+
+            MatrixPosition nextPosition;
+            double phi = (angle + 180d) * Math.PI / 180d;
+            int r = 1;
+
+            do
+            {
+                var deltaN = (int)Math.Round(r * Math.Cos(phi), 0, MidpointRounding.ToZero);
+                var deltaM = (int)Math.Round(r * Math.Sin(phi), 0, MidpointRounding.ToZero);
+                nextPosition = new MatrixPosition(startingPosition.M + deltaM, startingPosition.N + deltaN);
+                if (nextPosition != startingPosition
+                    // ReSharper disable once SimplifyLinqExpressionUseAll
+                    && !pointCoordinates.Any(x => x.Position == nextPosition)
+                    && IsPositionWithinImage(image, nextPosition))
+                {
+                    var pointOfInterest = new PointOfInterest(nextPosition, r);
+                    pointCoordinates.Add(pointOfInterest);
+                }
+
+                r++;
+            } while (IsPositionWithinImage(image, nextPosition) && r < MaxIterationLimit);
+
+            return pointCoordinates;
+        }
+
+        /// <summary>
         /// Draws a line from the <paramref name="center"/> to the edge of the <paramref name="image"/> using the
         /// <paramref name="angle"/> and returns the distance to the center (the radius) of all Points found on
-        /// this line.
+        /// this line, where a Point is a black Pixel.
         /// </summary>
         /// <remarks>
         /// <example>
@@ -120,18 +160,17 @@
         /// ]]>
         /// </example>
         /// </remarks>
-        private static List<int> FindAllPointFromCenterInAngle(BinaryImage image, MatrixPosition center, int angle)
+        private static IEnumerable<int> FindAllPointsFromCenterInAngle(
+            BinaryImage image,
+            MatrixPosition center,
+            int angle)
         {
-            var radiusOfPointsFound = new List<int>();
-            MatrixPosition nextPoint = center;
+            var coordinatesOfInterest =
+                GetAllCoordinatesFromStartingPointToEdgeInAngle(image, center, angle);
 
-            do
-            {
-                // TODO
-                nextPoint = new MatrixPosition(nextPoint.M + 1, nextPoint.N + 1);
-            } while (IsPositionWithinImage(image, nextPoint));
-
-            return radiusOfPointsFound;
+            return from pointOfInterest in coordinatesOfInterest
+                where image[pointOfInterest.Position] == BinaryImage.Black
+                select pointOfInterest.Radius;
         }
 
         private static bool IsPositionWithinImage(BinaryImage image, MatrixPosition position)
@@ -150,6 +189,23 @@
                     nameof(numberOfSamplingPoints),
                     "The number of sampling points must be between 4 and 360.");
             }
+        }
+
+        /// <summary>
+        /// Represents a pixel within a image that lies on the line for determining the signature
+        /// with its respectively distance (radius) to the center point.
+        /// </summary>
+        internal class PointOfInterest
+        {
+            internal PointOfInterest(MatrixPosition position, int radius)
+            {
+                this.Position = position;
+                this.Radius = radius;
+            }
+
+            internal MatrixPosition Position { get; }
+
+            internal int Radius { get; }
         }
     }
 }
