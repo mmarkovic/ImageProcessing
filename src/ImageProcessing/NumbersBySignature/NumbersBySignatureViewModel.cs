@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using System.Windows;
     using System.Windows.Media.Imaging;
 
     using ImageProcessing.NumbersBySignature.img;
@@ -20,6 +21,7 @@
             this.DownSizedBinaryImages = new ImagesModel();
             this.NumbersAsSmoothedBinaryImages = new ImagesModel();
             this.NumbersAsThinnedBinaryImages = new ImagesModel { DisplayIteration = true };
+            this.SignatureOfNumbers = new ImagesModel();
         }
 
         public async Task ProcessImagesAsync()
@@ -29,7 +31,8 @@
             var croppedImages = await this.CropImagesAsync(binaryImages);
             var downSizedImages = await this.DownSizeImagesAsync(croppedImages);
             var smoothedImages = await this.ApplySmoothingAsync(downSizedImages);
-            await this.ApplyThinningAsync(smoothedImages);
+            var thinnedImages = await this.ApplyThinningAsync(smoothedImages);
+            await this.CalculateSignatureAsync(thinnedImages);
         }
 
         public ImagesModel RawNumbers { get; }
@@ -43,6 +46,8 @@
         public ImagesModel NumbersAsSmoothedBinaryImages { get; }
 
         public ImagesModel NumbersAsThinnedBinaryImages { get; }
+
+        public ImagesModel SignatureOfNumbers { get; }
 
         private static async Task<BinaryImage[]> ExecuteFunctionOnImagesAsync<T>(
             IEnumerable<T> images,
@@ -200,6 +205,20 @@
             return await ExecuteFunctionOnImagesAsync(
                 binaryImages,
                 ThinningFunctionAsync);
+        }
+
+        private async Task<BinaryImage[]> CalculateSignatureAsync(IEnumerable<BinaryImage> binaryImages)
+        {
+            BinaryImage FunctionAsync(int index, BinaryImage binaryImage)
+            {
+                var processedImage = ImageProcessor.GetSignatureIn(binaryImage);
+                this.SignatureOfNumbers[index] = processedImage.ToBitmapImage();
+                return processedImage;
+            }
+
+            return await ExecuteFunctionOnImagesAsync(
+                binaryImages,
+                FunctionAsync);
         }
     }
 }

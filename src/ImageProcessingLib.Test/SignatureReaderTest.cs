@@ -48,8 +48,10 @@
 
             var result = SignatureReader.GetSignature(inputImage, 8);
 
-            result.Should().HaveCount(8);
-            var radiusPoints = result.Values.Select(x => x.Any() ? x[0] : 0).ToList();
+            result.NumberOfSamplingPoints.Should().Be(8);
+            int[][] points = result.Get();
+            points.Should().HaveCount(8);
+            var radiusPoints = points.Select(x => x.Any() ? x[0] : 0).ToList();
             radiusPoints.Should().ContainInOrder(expectedSignature);
         }
 

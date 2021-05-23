@@ -68,5 +68,11 @@
         {
             return Thinner.Thinning(binaryImage);
         }
+
+        public static BinaryImage GetSignatureIn(BinaryImage binaryImage)
+        {
+            var signature = SignatureReader.GetSignature(binaryImage, 180);
+            return SignaturePlotter.Plot(signature);
+        }
     }
 }

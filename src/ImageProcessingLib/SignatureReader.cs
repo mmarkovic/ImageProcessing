@@ -59,26 +59,26 @@
         /// The key of the dictionary represents the index of the sampling point.
         /// The value represents the radius from the center of all pixels found.
         /// </returns>
-        internal static IDictionary<int, IReadOnlyList<int>> GetSignature(BinaryImage image, int numberOfSamplingPoints)
+        internal static ShapeSignature GetSignature(BinaryImage image, int numberOfSamplingPoints)
         {
             CheckNumberOfSamplingPointsValueInRange(numberOfSamplingPoints);
 
             int angleIncrement = 360 / numberOfSamplingPoints;
-            var points = new Dictionary<int, IReadOnlyList<int>>();
+            var signature = new ShapeSignature(numberOfSamplingPoints);
 
             var center = GetCenterOfObjectIn(image);
 
-            for (int samplingPoint = 0; samplingPoint < numberOfSamplingPoints; samplingPoint++)
+            for (int samplingPointIndex = 0; samplingPointIndex < numberOfSamplingPoints; samplingPointIndex++)
             {
                 // value of the angle, at which the sampling from the center will be taken.
-                int angle = samplingPoint * angleIncrement;
+                int angle = samplingPointIndex * angleIncrement;
 
                 int[] pointsInAngle = FindAllPointsFromCenterInAngle(image, center, angle).ToArray();
 
-                points.Add(samplingPoint, pointsInAngle);
+                signature.Add(samplingPointIndex, pointsInAngle);
             }
 
-            return points;
+            return signature;
         }
 
         /// <summary>
@@ -103,7 +103,7 @@
         /// <paramref name="image"/>. The <paramref name="startingPosition"/> will not be returned in the
         /// result set.
         /// </summary>
-        internal static IReadOnlyList<PointOfInterest> GetAllCoordinatesFromStartingPointToEdgeInAngle(
+        internal static IEnumerable<PointOfInterest> GetAllCoordinatesFromStartingPointToEdgeInAngle(
             BinaryImage image,
             MatrixPosition startingPosition,
             int angle)

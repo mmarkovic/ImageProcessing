@@ -1,4 +1,4 @@
-﻿<UserControl  x:Class="ImageProcessing.NumbersBySignature.NumbersBySignatureView"
+﻿<UserControl x:Class="ImageProcessing.NumbersBySignature.NumbersBySignatureView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,7 +8,8 @@
              Background="White"
              d:DesignHeight="450"
              d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance d:Type={x:Type local:NumbersBySignatureViewModel}}" Loaded="NumbersBySignatureView_OnLoaded">
+             d:DataContext="{d:DesignInstance d:Type={x:Type local:NumbersBySignatureViewModel}}"
+             Loaded="NumbersBySignatureView_OnLoaded">
     <UserControl.Resources>
         <Style TargetType="TextBlock">
             <Setter Property="Padding" Value="0 7" />
@@ -29,6 +30,8 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="3*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="3*" />
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Text="Recognize Numbers by Signature" FontSize="20" />
         <TextBlock Grid.Row="1" Text="These are the raw images of our numbers. To identify the displayed images we will process the following steps one after another." />
@@ -43,5 +46,7 @@
         <local:ImageRowView Grid.Row="10" DataContext="{Binding NumbersAsSmoothedBinaryImages}" />
         <TextBlock Grid.Row="11" Text="Step 5: Thin the lines down to one pixel." />
         <local:ImageRowView Grid.Row="12" DataContext="{Binding NumbersAsThinnedBinaryImages}" />
+        <TextBlock Grid.Row="13" Text="Step 6: Calculate the signature." />
+        <local:ImageRowView Grid.Row="14" DataContext="{Binding SignatureOfNumbers}" />
     </Grid>
 </UserControl>
