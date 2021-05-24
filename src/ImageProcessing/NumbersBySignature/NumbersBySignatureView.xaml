@@ -31,9 +31,9 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="3*" />
+            <RowDefinition Height="2*" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="3*" />
+            <RowDefinition Height="2*" />
         </Grid.RowDefinitions>
         <TextBlock Grid.Row="0" Text="Recognize Numbers by Signature" FontSize="20" />
         <TextBlock Grid.Row="1" Text="These are the raw images of our numbers. To identify the displayed images we will process the following steps one after another." />

@@ -24,39 +24,35 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Image Grid.Column="0" Grid.Row="0" Source="{Binding Number0Image}" />
-        <Image Grid.Column="1" Grid.Row="0" Source="{Binding Number1Image}" />
-        <Image Grid.Column="2" Grid.Row="0" Source="{Binding Number2Image}" />
-        <Image Grid.Column="3" Grid.Row="0" Source="{Binding Number3Image}" />
-        <Image Grid.Column="4" Grid.Row="0" Source="{Binding Number4Image}" />
-        <Image Grid.Column="5" Grid.Row="0" Source="{Binding Number5Image}" />
-        <Image Grid.Column="6" Grid.Row="0" Source="{Binding Number6Image}" />
-        <Image Grid.Column="7" Grid.Row="0" Source="{Binding Number7Image}" />
-        <Image Grid.Column="8" Grid.Row="0" Source="{Binding Number8Image}" />
-        <Image Grid.Column="9" Grid.Row="0" Source="{Binding Number9Image}" />
-        <Label Grid.Column="0" Grid.Row="1" Content="{Binding Number0ProcessingIteration}"
+        <Image Grid.Column="0" Source="{Binding Number0Image}" />
+        <Image Grid.Column="1" Source="{Binding Number1Image}" />
+        <Image Grid.Column="2" Source="{Binding Number2Image}" />
+        <Image Grid.Column="3" Source="{Binding Number3Image}" />
+        <Image Grid.Column="4" Source="{Binding Number4Image}" />
+        <Image Grid.Column="5" Source="{Binding Number5Image}" />
+        <Image Grid.Column="6" Source="{Binding Number6Image}" />
+        <Image Grid.Column="7" Source="{Binding Number7Image}" />
+        <Image Grid.Column="8" Source="{Binding Number8Image}" />
+        <Image Grid.Column="9" Source="{Binding Number9Image}" />
+        <Label Grid.Column="0" Content="{Binding Number0ProcessingIteration}"
                Visibility="{Binding DisplayIteration, Converter={StaticResource BoolToVisibilityConverter}}" />
-        <Label Grid.Column="1" Grid.Row="1" Content="{Binding Number1ProcessingIteration}"
+        <Label Grid.Column="1" Content="{Binding Number1ProcessingIteration}"
                Visibility="{Binding DisplayIteration, Converter={StaticResource BoolToVisibilityConverter}}" />
-        <Label Grid.Column="2" Grid.Row="1" Content="{Binding Number2ProcessingIteration}"
+        <Label Grid.Column="2" Content="{Binding Number2ProcessingIteration}"
                Visibility="{Binding DisplayIteration, Converter={StaticResource BoolToVisibilityConverter}}" />
-        <Label Grid.Column="3" Grid.Row="1" Content="{Binding Number3ProcessingIteration}"
+        <Label Grid.Column="3" Content="{Binding Number3ProcessingIteration}"
                Visibility="{Binding DisplayIteration, Converter={StaticResource BoolToVisibilityConverter}}" />
-        <Label Grid.Column="4" Grid.Row="1" Content="{Binding Number4ProcessingIteration}"
+        <Label Grid.Column="4" Content="{Binding Number4ProcessingIteration}"
                Visibility="{Binding DisplayIteration, Converter={StaticResource BoolToVisibilityConverter}}" />
-        <Label Grid.Column="5" Grid.Row="1" Content="{Binding Number5ProcessingIteration}"
+        <Label Grid.Column="5" Content="{Binding Number5ProcessingIteration}"
                Visibility="{Binding DisplayIteration, Converter={StaticResource BoolToVisibilityConverter}}" />
-        <Label Grid.Column="6" Grid.Row="1" Content="{Binding Number6ProcessingIteration}"
+        <Label Grid.Column="6" Content="{Binding Number6ProcessingIteration}"
                Visibility="{Binding DisplayIteration, Converter={StaticResource BoolToVisibilityConverter}}" />
-        <Label Grid.Column="7" Grid.Row="1" Content="{Binding Number7ProcessingIteration}"
+        <Label Grid.Column="7" Content="{Binding Number7ProcessingIteration}"
                Visibility="{Binding DisplayIteration, Converter={StaticResource BoolToVisibilityConverter}}" />
-        <Label Grid.Column="8" Grid.Row="1" Content="{Binding Number8ProcessingIteration}"
+        <Label Grid.Column="8" Content="{Binding Number8ProcessingIteration}"
                Visibility="{Binding DisplayIteration, Converter={StaticResource BoolToVisibilityConverter}}" />
-        <Label Grid.Column="9" Grid.Row="1" Content="{Binding Number9ProcessingIteration}"
+        <Label Grid.Column="9" Content="{Binding Number9ProcessingIteration}"
                Visibility="{Binding DisplayIteration, Converter={StaticResource BoolToVisibilityConverter}}" />
     </Grid>
 </UserControl>
