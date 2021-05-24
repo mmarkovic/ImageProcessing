@@ -2,9 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
-    using System.Windows;
     using System.Windows.Media.Imaging;
 
     using ImageProcessing.NumbersBySignature.img;
@@ -93,7 +93,18 @@
             return processedImages;
         }
 
-        private BitmapImage[] LoadImages()
+        private static void WriteImageToAppDirectory(BitmapSource image, string imageName)
+        {
+            string currentDirectory = Environment.CurrentDirectory;
+            BitmapEncoder encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(image));
+            string filePath = Path.Combine(currentDirectory, imageName);
+
+            using var fileStream = new FileStream(filePath, FileMode.Create);
+            encoder.Save(fileStream);
+        }
+
+        private IEnumerable<BitmapImage> LoadImages()
         {
             var rawImages = new List<byte[]>
             {
@@ -136,7 +147,9 @@
             BinaryImage CroppingFunction(int index, BinaryImage binaryImage)
             {
                 var processedImage = ImageProcessor.CropAroundFigures(binaryImage);
-                this.CroppedBinaryImages[index] = processedImage.ToBitmapImage();
+                var processedBitmapImage = processedImage.ToBitmapImage();
+                this.CroppedBinaryImages[index] = processedBitmapImage;
+                WriteImageToAppDirectory(processedBitmapImage, $"cropped_{index:00}.png");
                 return processedImage;
             }
 
@@ -150,7 +163,9 @@
             BinaryImage ShrinkingFunction(int index, BinaryImage binaryImage)
             {
                 var processedImage = ImageProcessor.DownSizeToHalf(binaryImage);
-                this.DownSizedBinaryImages[index] = processedImage.ToBitmapImage();
+                var processedBitmapImage = processedImage.ToBitmapImage();
+                this.DownSizedBinaryImages[index] = processedBitmapImage;
+                WriteImageToAppDirectory(processedBitmapImage, $"downSized_{index:00}.png");
                 return processedImage;
             }
 
@@ -164,7 +179,9 @@
             BinaryImage SmoothingFunction(int index, BinaryImage binaryImage)
             {
                 var processedImage = ImageProcessor.Smoothing(binaryImage);
-                this.NumbersAsSmoothedBinaryImages[index] = processedImage.ToBitmapImage();
+                var processedBitmapImage = processedImage.ToBitmapImage();
+                this.NumbersAsSmoothedBinaryImages[index] = processedBitmapImage;
+                WriteImageToAppDirectory(processedBitmapImage, $"smoothed_{index:00}.png");
                 return processedImage;
             }
 
@@ -212,7 +229,9 @@
             BinaryImage FunctionAsync(int index, BinaryImage binaryImage)
             {
                 var processedImage = ImageProcessor.GetSignatureIn(binaryImage);
-                this.SignatureOfNumbers[index] = processedImage.ToBitmapImage();
+                var processedBitmapImage = processedImage.ToBitmapImage();
+                this.SignatureOfNumbers[index] = processedBitmapImage;
+                WriteImageToAppDirectory(processedBitmapImage, $"signature_{index:00}.png");
                 return processedImage;
             }
 
