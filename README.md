@@ -25,7 +25,7 @@ in the image. The reason we want the signature is:
 * It can be scaled to a normalized graph, so that the scale of the number in the image can be neglected.
 
 
-### Step 1: converting the image to a binary image
+### Step 1: convertion to binary image
 
 An image is represented by a matrix containing its color as a RGB (red, green, blue) value. We can convert
 those pixels by applying a given threashold `t` to their color values. Is the average color value of a pixel
@@ -46,9 +46,72 @@ belove the threashold `t`, then we convert this pixel to black (represented by 1
  [ 0xFFFFFF 0xFFFFFF 0xFFFFFF 0xFFFFFF ]          [ 0 0 0 0 ]
 ```
 
-original (color) | . | converted (binary)
+Before (color) | . | After (binary)
 ---------------- | - | ------------------
 <img src="./doc/RawNumbers/5.jpg" height="100px"> | => | <img src="./doc/Binary/binary_05.png" height="100px">
+
+
+### Step 2: cropping
+
+The goal of this step is to reduce the amount of pixels for further processing to speed up things. This
+can easily be done by cropping all unnecessary areas around our object in the image. For this we determine
+the black pixels at the edge (`top`, `right`, `bottom`, `left`) of our object in the image and only
+consider the matrix range within these edges with a smal offset of 1 pixel.
+
+```
+Binary image   (for better readability:  0 -> . | 1 -> #)
+
+      0 1 2 3 4 5 6 7 8 9 10
+  . -------------------------> n (zero based)          Cropped Image
+0 | [ . . . . . . . . . . . ]                          [ . . . . . . ]
+1 | [ . . . . . . . . . . . ]  top edge: m=2           [ . # . . . . ]
+2 | [ . . . # . . . . . . . ]  right edge: n=6   --->  [ . # # . . . ]
+3 | [ . . . # # . . . . . . ]  bottom edge: m=5        [ . # # # . . ]
+4 | [ . . . # # # . . . . . ]  left edge: n=3          [ . # # # # . ]
+5 | [ . . . # # # # . . . . ]                          [ . . . . . . ]
+6 | [ . . . . . . . . . . . ] 
+7 | [ . . . . . . . . . . . ]
+  v
+m (zero based)
+```
+
+Before | . | After (cropped)
+-------- | - | -------
+<img src="./doc/Binary/binary_05.png" height="100px"> | => | <img src="./doc/Cropped/cropped_05.png" height="60px">
+
+
+### Step 3: Shrinking
+
+In this step we want to reduce the amout of pixels processed even further by shrinking the size of the
+image. For this we consider the pixels in a `2x2` matrix. If the majority of the pixels is 1 (black)
+in this matrix, the final pixel will also be 1 (black), otherwise 0 (white). By doing so we can shrink
+the size of the image to half.
+
+```
+Binary image   (for better readability:  0 -> . | 1 -> #)
+
+Original (16x16)            Shrinked (8x8)
+[ .. .. .. .. .. .. .. .. ]   [ . . . . . . . . ]
+[ .. .# ## ## ## ## #. .. ]   [ . # # # # # # . ]
+[ .. .# ## ## ## ## ## .. ]   [ . # . . . . . . ]
+[ .. ## ## ## ## ## #. .. ]   [ . # . . . . . . ]
+[ .. ## #. .. .. .. .. .. ]   [ . # # # # # . . ]
+[ .. ## #. .. .. .. .. .. ]   [ . # . . . . . . ]
+[ .. ## #. .. .. .. .. .. ]   [ . # # # # # # . ]
+[ .. ## ## ## ## ## #. .. ]   [ . . . . . . . . ]
+[ .. .# ## ## ## ## #. .. ]
+[ .. ## ## ## ## ## .. .. ]
+[ .. ## #. .. .. .. .. .. ]
+[ .. ## #. .. .. .. .. .. ]
+[ .. ## ## ## ## ## #. .. ]
+[ .. ## ## ## ## ## ## .. ]
+[ .. .# ## ## ## ## #. .. ]
+[ .. .. .. .. .. .. .. .. ]
+```
+
+Before   | . | After (shrinked)
+-------- | - | -------
+<img src="./doc/Cropped/cropped_05.png" height="100px"> | => | <img src="./doc/DownSizing/img/downSizedImage_05.png" height="100px">
 
 
 ### Application
