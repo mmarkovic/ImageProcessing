@@ -140,7 +140,9 @@
             BinaryImage ConvertingFunction(int index, BitmapImage bitmapImage)
             {
                 var processedImage = BinaryImage.FromImage(bitmapImage.ToBitmap());
-                this.NumbersAsBinaryImage[index] = processedImage.ToBitmapImage();
+                var processedBitmapImage = processedImage.ToBitmapImage();
+                this.NumbersAsBinaryImage[index] = processedBitmapImage;
+                WriteImageToAppDirectory(processedBitmapImage, $"binary_{index:00}.png");
                 return processedImage;
             }
 
