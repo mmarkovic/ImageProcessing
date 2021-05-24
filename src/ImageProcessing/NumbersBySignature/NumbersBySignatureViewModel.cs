@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
@@ -13,6 +14,8 @@
 
     public class NumbersBySignatureViewModel
     {
+        private const int SamplingRate = 180;
+
         public NumbersBySignatureViewModel()
         {
             this.RawNumbers = new ImagesModel();
@@ -21,6 +24,7 @@
             this.DownSizedBinaryImages = new ImagesModel();
             this.NumbersAsSmoothedBinaryImages = new ImagesModel();
             this.NumbersAsThinnedBinaryImages = new ImagesModel { DisplayIteration = true };
+            this.SampledImages = new ImagesModel();
             this.SignatureOfNumbers = new ImagesModel();
         }
 
@@ -32,6 +36,7 @@
             var downSizedImages = await this.DownSizeImagesAsync(croppedImages);
             var smoothedImages = await this.ApplySmoothingAsync(downSizedImages);
             var thinnedImages = await this.ApplyThinningAsync(smoothedImages);
+            await this.DrawSignatureSamplingLinesOn(thinnedImages);
             await this.CalculateSignatureAsync(thinnedImages);
         }
 
@@ -47,11 +52,13 @@
 
         public ImagesModel NumbersAsThinnedBinaryImages { get; }
 
+        public ImagesModel SampledImages { get; }
+
         public ImagesModel SignatureOfNumbers { get; }
 
-        private static async Task<BinaryImage[]> ExecuteFunctionOnImagesAsync<T>(
-            IEnumerable<T> images,
-            Func<int, T, BinaryImage> processingFunction)
+        private static async Task<TReturn[]> ExecuteFunctionOnImagesAsync<TIn, TReturn>(
+            IEnumerable<TIn> images,
+            Func<int, TIn, TReturn> processingFunction)
         {
             var binaryImagesDict = images.ToIndexedDictionary();
 
@@ -63,7 +70,7 @@
                             return Task.Run(
                                 () =>
                                 {
-                                    (int index, T binaryImage) = kvp;
+                                    (int index, TIn binaryImage) = kvp;
                                     return processingFunction(index, binaryImage);
                                 });
                         }));
@@ -224,18 +231,34 @@
                 ThinningFunctionAsync);
         }
 
-        private async Task<BinaryImage[]> CalculateSignatureAsync(IEnumerable<BinaryImage> binaryImages)
+        private async Task DrawSignatureSamplingLinesOn(IEnumerable<BinaryImage> binaryImages)
         {
-            BinaryImage FunctionAsync(int index, BinaryImage binaryImage)
+            Bitmap FunctionAsync(int index, BinaryImage binaryImage)
             {
-                var processedImage = ImageProcessor.GetSignatureIn(binaryImage);
+                var processedImage = ImageProcessor.DrawSignatureSamplingLinesOn(binaryImage, SamplingRate);
                 var processedBitmapImage = processedImage.ToBitmapImage();
-                this.SignatureOfNumbers[index] = processedBitmapImage;
-                WriteImageToAppDirectory(processedBitmapImage, $"signature_{index:00}.png");
+                this.SampledImages[index] = processedBitmapImage;
+                WriteImageToAppDirectory(processedBitmapImage, $"sampledSignature{SamplingRate}_{index:00}.png");
                 return processedImage;
             }
 
-            return await ExecuteFunctionOnImagesAsync(
+            await ExecuteFunctionOnImagesAsync(
+                binaryImages,
+                FunctionAsync);
+        }
+
+        private async Task CalculateSignatureAsync(IEnumerable<BinaryImage> binaryImages)
+        {
+            BinaryImage FunctionAsync(int index, BinaryImage binaryImage)
+            {
+                var processedImage = ImageProcessor.GetSignatureIn(binaryImage, SamplingRate);
+                var processedBitmapImage = processedImage.ToBitmapImage();
+                this.SignatureOfNumbers[index] = processedBitmapImage;
+                WriteImageToAppDirectory(processedBitmapImage, $"signature{SamplingRate}_{index:00}.png");
+                return processedImage;
+            }
+
+            await ExecuteFunctionOnImagesAsync(
                 binaryImages,
                 FunctionAsync);
         }

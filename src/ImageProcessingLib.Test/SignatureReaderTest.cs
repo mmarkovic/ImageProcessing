@@ -75,11 +75,11 @@
             var inputImage = new BinaryImage(10, 10);
             var startingPoint = new MatrixPosition(5, 5);
 
-            var result = SignatureReader.GetAllCoordinatesFromStartingPointToEdgeInAngle(
+            var result = SignatureReader.GetSamplingLineForAngle(
                 inputImage,
                 startingPoint,
                 angle);
-            var resultingPositions = result.Select(x => x.Position).ToArray();
+            var resultingPositions = result.SamplingPoints.Select(x => x.Position).ToArray();
 
             resultingPositions.Should().ContainInOrder(expectedResult, testcaseName);
             resultingPositions.Should().HaveCount(expectedResult.Length);

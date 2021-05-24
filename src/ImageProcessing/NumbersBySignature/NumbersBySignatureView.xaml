@@ -29,6 +29,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="3*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="3*" />
@@ -46,7 +48,9 @@
         <local:ImageRowView Grid.Row="10" DataContext="{Binding NumbersAsSmoothedBinaryImages}" />
         <TextBlock Grid.Row="11" Text="Step 5: Thin the lines down to one pixel." />
         <local:ImageRowView Grid.Row="12" DataContext="{Binding NumbersAsThinnedBinaryImages}" />
-        <TextBlock Grid.Row="13" Text="Step 6: Calculate the signature." />
-        <local:ImageRowView Grid.Row="14" DataContext="{Binding SignatureOfNumbers}" />
+        <TextBlock Grid.Row="13" Text="Step 6: Get the sampling lines for determining the signature." />
+        <local:ImageRowView Grid.Row="14" DataContext="{Binding SampledImages}" />
+        <TextBlock Grid.Row="15" Text="Step 7: Calculate the signature." />
+        <local:ImageRowView Grid.Row="16" DataContext="{Binding SignatureOfNumbers}" />
     </Grid>
 </UserControl>

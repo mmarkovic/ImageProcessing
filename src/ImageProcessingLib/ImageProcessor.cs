@@ -1,6 +1,5 @@
 ﻿namespace ImageProcessingLib
 {
-    using System.Collections.Generic;
     using System.Drawing;
     using System.Threading.Tasks;
 
@@ -69,10 +68,16 @@
             return Thinner.Thinning(binaryImage);
         }
 
-        public static BinaryImage GetSignatureIn(BinaryImage binaryImage)
+        public static BinaryImage GetSignatureIn(BinaryImage binaryImage, int samplingRate = 180)
         {
-            var signature = SignatureReader.GetSignature(binaryImage, 180);
+            var signature = SignatureReader.GetSignature(binaryImage, samplingRate);
             return SignaturePlotter.Plot(signature);
+        }
+
+        public static Bitmap DrawSignatureSamplingLinesOn(BinaryImage binaryImage, int samplingRate = 64)
+        {
+            var samplingLines = SignatureReader.GetSamplingLines(binaryImage, samplingRate);
+            return SamplingLinePlotter.Plot(binaryImage, samplingLines);
         }
     }
 }

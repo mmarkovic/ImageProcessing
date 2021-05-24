@@ -52,30 +52,26 @@
     internal static class SignatureReader
     {
         /// <summary>
-        /// Gets the signature of an object in <paramref name="image"/> by using 16 sampling points.
+        /// Gets the signature of an object in <paramref name="image"/> by using a variable number of sampling lines.
         /// </summary>
         /// <returns>
         /// The coordinates of the signature points in an ordered list.
         /// The key of the dictionary represents the index of the sampling point.
         /// The value represents the radius from the center of all pixels found.
         /// </returns>
-        internal static ShapeSignature GetSignature(BinaryImage image, int numberOfSamplingPoints)
+        internal static ShapeSignature GetSignature(BinaryImage image, int numberOfSamplingLines)
         {
-            CheckNumberOfSamplingPointsValueInRange(numberOfSamplingPoints);
+            CheckNumberOfSamplingLinesIsInRange(numberOfSamplingLines);
 
-            int angleIncrement = 360 / numberOfSamplingPoints;
-            var signature = new ShapeSignature(numberOfSamplingPoints);
+            var signature = new ShapeSignature(numberOfSamplingLines);
+            int samplingIndex = 0;
 
-            var center = GetCenterOfObjectIn(image);
-
-            for (int samplingPointIndex = 0; samplingPointIndex < numberOfSamplingPoints; samplingPointIndex++)
+            var samplingLines = GetSamplingLines(image, numberOfSamplingLines);
+            foreach (var samplingLine in samplingLines)
             {
-                // value of the angle, at which the sampling from the center will be taken.
-                int angle = samplingPointIndex * angleIncrement;
-
-                int[] pointsInAngle = FindAllPointsFromCenterInAngle(image, center, angle).ToArray();
-
-                signature.Add(samplingPointIndex, pointsInAngle);
+                int[] pointsInAngle = FindAllBlackPixelsOnSamplingLine(image, samplingLine).ToArray();
+                signature.Add(samplingIndex, pointsInAngle);
+                samplingIndex++;
             }
 
             return signature;
@@ -97,20 +93,60 @@
             return new MatrixPosition(centerMPoint, centerNPoint);
         }
 
+        internal static IReadOnlyCollection<SamplingLine> GetSamplingLines(BinaryImage image, int numberOfSamplingLines)
+        {
+            CheckNumberOfSamplingLinesIsInRange(numberOfSamplingLines);
+
+            double angleIncrement = 360d / numberOfSamplingLines;
+            var samplingLines = new SamplingLine[numberOfSamplingLines];
+
+            var center = GetCenterOfObjectIn(image);
+
+            for (int samplingIndex = 0; samplingIndex < numberOfSamplingLines; samplingIndex++)
+            {
+                // value of the angle, at which the sampling from the center will be taken.
+                int angle = (int)Math.Round(samplingIndex * angleIncrement, 0, MidpointRounding.ToZero);
+                var samplingLine = GetSamplingLineForAngle(image, center, angle);
+
+                samplingLines[samplingIndex] = samplingLine;
+            }
+
+            return samplingLines;
+        }
+
         /// <summary>
-        /// Returns the coordinates of the pixels that lie on the line, which is defined by the
+        /// Returns the coordinates of the pixels that lie on the sampling line, which is defined by the
         /// <paramref name="startingPosition"/> and its <paramref name="angle"/> to the edge of the
         /// <paramref name="image"/>. The <paramref name="startingPosition"/> will not be returned in the
         /// result set.
         /// </summary>
-        internal static IEnumerable<PointOfInterest> GetAllCoordinatesFromStartingPointToEdgeInAngle(
+        /// <remarks>
+        /// <example>
+        /// Here's an example using the angle of 45 degrees.
+        /// <![CDATA[
+        /// ^
+        /// |   E                         E = edge of the image
+        /// |    \                        \ = sampling line
+        /// |      \                      c = center
+        /// |        \
+        /// |          \
+        /// |            \
+        /// |              c
+        /// |
+        /// .
+        /// .
+        /// . --------------------------->
+        /// ]]>
+        /// </example>
+        /// </remarks>
+        internal static SamplingLine GetSamplingLineForAngle(
             BinaryImage image,
             MatrixPosition startingPosition,
             int angle)
         {
             const int MaxIterationLimit = 50000;
 
-            var pointCoordinates = new List<PointOfInterest>();
+            var samplingLine = new SamplingLine();
 
             MatrixPosition nextPosition;
             double phi = (angle + 180d) * Math.PI / 180d;
@@ -123,54 +159,26 @@
                 nextPosition = new MatrixPosition(startingPosition.M + deltaM, startingPosition.N + deltaN);
                 if (nextPosition != startingPosition
                     // ReSharper disable once SimplifyLinqExpressionUseAll
-                    && !pointCoordinates.Any(x => x.Position == nextPosition)
+                    && !samplingLine.ContainsPosition(nextPosition)
                     && IsPositionWithinImage(image, nextPosition))
                 {
-                    var pointOfInterest = new PointOfInterest(nextPosition, r);
-                    pointCoordinates.Add(pointOfInterest);
+                    var pointOfInterest = new SamplingPoint(nextPosition, r);
+                    samplingLine.Add(pointOfInterest);
                 }
 
                 r++;
             } while (IsPositionWithinImage(image, nextPosition) && r < MaxIterationLimit);
 
-            return pointCoordinates;
+            return samplingLine;
         }
 
-        /// <summary>
-        /// Draws a line from the <paramref name="center"/> to the edge of the <paramref name="image"/> using the
-        /// <paramref name="angle"/> and returns the distance to the center (the radius) of all Points found on
-        /// this line, where a Point is a black Pixel.
-        /// </summary>
-        /// <remarks>
-        /// <example>
-        /// Here's an example using the angle of 45 degrees.
-        /// <![CDATA[
-        /// ^
-        /// |   E                         E = edge of the image
-        /// |    \                        X = point found in image on the line
-        /// |      \                      c = center
-        /// |        X
-        /// |          \
-        /// |            \
-        /// |              c
-        /// |
-        /// .
-        /// .
-        /// . --------------------------->
-        /// ]]>
-        /// </example>
-        /// </remarks>
-        private static IEnumerable<int> FindAllPointsFromCenterInAngle(
+        private static IEnumerable<int> FindAllBlackPixelsOnSamplingLine(
             BinaryImage image,
-            MatrixPosition center,
-            int angle)
+            SamplingLine samplingLine)
         {
-            var coordinatesOfInterest =
-                GetAllCoordinatesFromStartingPointToEdgeInAngle(image, center, angle);
-
-            return from pointOfInterest in coordinatesOfInterest
-                where image[pointOfInterest.Position] == BinaryImage.Black
-                select pointOfInterest.Radius;
+            return from samplingPoints in samplingLine.SamplingPoints
+                where image[samplingPoints.Position] == BinaryImage.Black
+                select samplingPoints.Radius;
         }
 
         private static bool IsPositionWithinImage(BinaryImage image, MatrixPosition position)
@@ -181,31 +189,14 @@
                    && position.N < image.Size.Width;
         }
 
-        private static void CheckNumberOfSamplingPointsValueInRange(int numberOfSamplingPoints)
+        private static void CheckNumberOfSamplingLinesIsInRange(int numberOfSamplingLines)
         {
-            if (numberOfSamplingPoints is < 4 or > 360)
+            if (numberOfSamplingLines is < 4 or > 360)
             {
                 throw new ArgumentOutOfRangeException(
-                    nameof(numberOfSamplingPoints),
+                    nameof(numberOfSamplingLines),
                     "The number of sampling points must be between 4 and 360.");
             }
-        }
-
-        /// <summary>
-        /// Represents a pixel within a image that lies on the line for determining the signature
-        /// with its respectively distance (radius) to the center point.
-        /// </summary>
-        internal class PointOfInterest
-        {
-            internal PointOfInterest(MatrixPosition position, int radius)
-            {
-                this.Position = position;
-                this.Radius = radius;
-            }
-
-            internal MatrixPosition Position { get; }
-
-            internal int Radius { get; }
         }
     }
 }
