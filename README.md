@@ -1,3 +1,6 @@
+[![.NET](https://github.com/mmarkovic/ImageProcessing/actions/workflows/dotnet.yml/badge.svg)](https://github.com/bbvch-academy/CleanCpp.Academy.Coronan/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 # ImageProcessing
 
 Contains multiple examples on how images can be processed using C# .NET.
@@ -6,7 +9,7 @@ Contains multiple examples on how images can be processed using C# .NET.
 
 ### Overview
 
-In the first example we will try to identify numbers (0-9) in an image by using their signature.
+The goal is to identify numbers (0-9) in an image by using their signature.
 
 These are the images with the numbers in their unprocessed from.
 
