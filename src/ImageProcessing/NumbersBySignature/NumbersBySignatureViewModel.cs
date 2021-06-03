@@ -14,7 +14,23 @@
 
     public class NumbersBySignatureViewModel
     {
+        /// <summary>
+        /// The applied sampling rate for calculating the signatures.
+        /// </summary>
+        /// <remarks>
+        /// The value should be in the range between 90 and 360.
+        /// </remarks>
         private const int SamplingRate = 180;
+
+        /// <summary>
+        /// Determines if all processed images should be written on the disk.
+        /// </summary>
+        /// <remarks>
+        /// This is useful, to check every processing steps for debugging reasons and to
+        /// verify the applied algorithm. But if the application behaves as expected, it
+        /// can produced undesired noise and should therefore be deactivated.
+        /// </remarks>
+        private const bool WriteCalculatedImagesToDisk = false;
 
         public NumbersBySignatureViewModel()
         {
@@ -102,6 +118,11 @@
 
         private static void WriteImageToAppDirectory(BitmapSource image, string imageName)
         {
+            if (!WriteCalculatedImagesToDisk)
+            {
+                return;
+            }
+
             string currentDirectory = Environment.CurrentDirectory;
             BitmapEncoder encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(image));
