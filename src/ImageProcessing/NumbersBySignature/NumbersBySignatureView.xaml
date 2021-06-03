@@ -9,48 +9,106 @@
              d:DesignHeight="450"
              d:DesignWidth="800"
              d:DataContext="{d:DesignInstance d:Type={x:Type local:NumbersBySignatureViewModel}}"
-             Loaded="NumbersBySignatureView_OnLoaded">
+             >
     <UserControl.Resources>
         <Style TargetType="TextBlock">
-            <Setter Property="Padding" Value="0 7" />
+            <Setter Property="Padding" Value="0 5" />
+        </Style>
+        <Style TargetType="TextBlock" x:Key="Title2Style">
+            <Setter Property="FontSize" Value="15" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="8 3" />
         </Style>
     </UserControl.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="2*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="2*" />
-        </Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="Recognize Numbers by Signature" FontSize="20" />
-        <TextBlock Grid.Row="1" Text="These are the raw images of our numbers. To identify the displayed images we will process the following steps one after another." />
-        <local:ImageRowView Grid.Row="2" DataContext="{Binding RawNumbers}" />
-        <TextBlock Grid.Row="3" Text="Step 1: Converting the images to black and white." />
-        <local:ImageRowView Grid.Row="4" DataContext="{Binding NumbersAsBinaryImage}" />
-        <TextBlock Grid.Row="5" Text="Step 2: Crop images." />
-        <local:ImageRowView Grid.Row="6"  DataContext="{Binding CroppedBinaryImages}" />
-        <TextBlock Grid.Row="7" Text="Step 3: Shrink images." />
-        <local:ImageRowView Grid.Row="8" DataContext="{Binding DownSizedBinaryImages}" />
-        <TextBlock Grid.Row="9" Text="Step 4: Remove noises." />
-        <local:ImageRowView Grid.Row="10" DataContext="{Binding NumbersAsSmoothedBinaryImages}" />
-        <TextBlock Grid.Row="11" Text="Step 5: Thin the lines down to one pixel." />
-        <local:ImageRowView Grid.Row="12" DataContext="{Binding NumbersAsThinnedBinaryImages}" />
-        <TextBlock Grid.Row="13" Text="Step 6: Get the sampling lines for determining the signature." />
-        <local:ImageRowView Grid.Row="14" DataContext="{Binding SampledImages}" />
-        <TextBlock Grid.Row="15" Text="Step 7: Calculate the signature." />
-        <local:ImageRowView Grid.Row="16" DataContext="{Binding SignatureOfNumbers}" />
-    </Grid>
+    <DockPanel>
+        <TextBlock DockPanel.Dock="Top" Text="Recognize Numbers by Signature" FontSize="20" />
+        <TextBlock DockPanel.Dock="Top" Text="This program tries to identify numbers displayed on an image using the 
+numbers signature. If the calculated signature matches with one of the predefined template signatures, the matching
+number will be displayed as result." TextWrapping="Wrap" />
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" DockPanel.Dock="Top" Margin="0 10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <WrapPanel Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Image Source="./img/rawInputNumbers/1.jpg" />
+                </WrapPanel>
+                <StackPanel Grid.Column="1">
+                    <Button Content="Identify"
+                            HorizontalAlignment="Center"
+                            Command="{Binding IdentifyImageCommand}"
+                            Margin="0 10" />
+                    <ProgressBar Height="15" Margin="20 10" Visibility="Collapsed" />
+                </StackPanel>
+                <Viewbox Grid.Column="2">
+                    <Label Content="{Binding IdentifiedNumberResult}"
+                           Margin="0"
+                           Padding="0" />
+                </Viewbox>
+            </Grid>
+            <DockPanel Grid.Row="1" DockPanel.Dock="Top">
+                <TextBlock DockPanel.Dock="Top" Style="{StaticResource Title2Style}" Text="Calculated Signature" />
+                <Grid Background="LightGray" Height="85" DockPanel.Dock="Top">
+                    <Image Source="{Binding SignatureImage}" Stretch="Fill" />
+                </Grid>
+            </DockPanel>
+            <DockPanel Grid.Row="2" DockPanel.Dock="Bottom">
+                <TextBlock DockPanel.Dock="Top" Style="{StaticResource Title2Style}" Text="Signature Match" />
+                <Grid>
+                    <Grid.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="Snow" />
+                            <Setter Property="Background" >
+                                <Setter.Value>
+                                    <SolidColorBrush Color="Gray" Opacity="0.9"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="VerticalAlignment" Value="Top" />
+                            <Setter Property="HorizontalAlignment" Value="Left" />
+                            <Setter Property="Padding" Value="2 0" />
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Image Source="./img/signatureTemplates/signTemplate360_00.png" Stretch="Fill" Grid.Column="0" Grid.Row="0" />
+                    <TextBlock Grid.Column="0" Grid.Row="0" Text="0" />
+                    <Image Source="./img/signatureTemplates/signTemplate360_01.png" Stretch="Fill" Grid.Column="1" Grid.Row="0" />
+                    <TextBlock Grid.Column="1" Grid.Row="0" Text="1" />
+                    <Image Source="./img/signatureTemplates/signTemplate360_02.png" Stretch="Fill" Grid.Column="2" Grid.Row="0" />
+                    <TextBlock Grid.Column="2" Grid.Row="0" Text="2" />
+                    <Image Source="./img/signatureTemplates/signTemplate360_03.png" Stretch="Fill" Grid.Column="3" Grid.Row="0" />
+                    <TextBlock Grid.Column="3" Grid.Row="0" Text="3" />
+                    <Image Source="./img/signatureTemplates/signTemplate360_04.png" Stretch="Fill" Grid.Column="4" Grid.Row="0" />
+                    <TextBlock Grid.Column="4" Grid.Row="0" Text="4" />
+                    <Image Source="./img/signatureTemplates/signTemplate360_05.png" Stretch="Fill" Grid.Column="0" Grid.Row="1" />
+                    <TextBlock Grid.Column="0" Grid.Row="1" Text="5" />
+                    <Image Source="./img/signatureTemplates/signTemplate360_06.png" Stretch="Fill" Grid.Column="1" Grid.Row="1" />
+                    <TextBlock Grid.Column="1" Grid.Row="1" Text="6" />
+                    <Image Source="./img/signatureTemplates/signTemplate360_07.png" Stretch="Fill" Grid.Column="2" Grid.Row="1" />
+                    <TextBlock Grid.Column="2" Grid.Row="1" Text="7" />
+                    <Image Source="./img/signatureTemplates/signTemplate360_08.png"  Stretch="Fill" Grid.Column="3" Grid.Row="1" />
+                    <TextBlock Grid.Column="3" Grid.Row="1" Text="8" />
+                    <Image Source="./img/signatureTemplates/signTemplate360_09.png" Stretch="Fill" Grid.Column="4" Grid.Row="1" />
+                    <TextBlock Grid.Column="4" Grid.Row="1" Text="9" />
+                </Grid>
+            </DockPanel>
+        </Grid>
+    </DockPanel>
 </UserControl>

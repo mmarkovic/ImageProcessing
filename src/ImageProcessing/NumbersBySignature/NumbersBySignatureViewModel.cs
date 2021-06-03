@@ -2,17 +2,20 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Drawing;
+    using System.ComponentModel;
     using System.IO;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
+    using System.Windows.Input;
     using System.Windows.Media.Imaging;
 
+    using ImageProcessing.Annotations;
     using ImageProcessing.NumbersBySignature.img;
 
     using ImageProcessingLib;
 
-    public class NumbersBySignatureViewModel
+    public class NumbersBySignatureViewModel : INotifyPropertyChanged
     {
         /// <summary>
         /// The applied sampling rate for calculating the signatures.
@@ -32,45 +35,47 @@
         /// </remarks>
         private const bool WriteCalculatedImagesToDisk = false;
 
+        private string identifiedNumberResult;
+        private BitmapImage signatureImage;
+
         public NumbersBySignatureViewModel()
         {
-            this.RawNumbers = new ImagesModel();
-            this.NumbersAsBinaryImage = new ImagesModel();
-            this.CroppedBinaryImages = new ImagesModel();
-            this.DownSizedBinaryImages = new ImagesModel();
-            this.NumbersAsSmoothedBinaryImages = new ImagesModel();
-            this.NumbersAsThinnedBinaryImages = new ImagesModel { DisplayIteration = true };
-            this.SampledImages = new ImagesModel();
-            this.SignatureOfNumbers = new ImagesModel();
+            this.signatureImage = new BitmapImage();
+            this.IdentifyImageCommand = new AsyncRelayCommand(async _ => await this.IdentifyImageAsync());
         }
 
-        public async Task ProcessImagesAsync()
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        public ICommand IdentifyImageCommand { get; }
+
+        public BitmapImage SignatureImage
         {
-            var rawBitmapImages = this.LoadImages();
-            var binaryImages = await this.ProcessImagesToBinaryImagesAsync(rawBitmapImages);
-            var croppedImages = await this.CropImagesAsync(binaryImages);
-            var downSizedImages = await this.DownSizeImagesAsync(croppedImages);
-            var smoothedImages = await this.ApplySmoothingAsync(downSizedImages);
-            var thinnedImages = await this.ApplyThinningAsync(smoothedImages);
-            await this.DrawSignatureSamplingLinesOn(thinnedImages);
-            await this.CalculateSignatureAsync(thinnedImages);
+            get => this.signatureImage;
+            set
+            {
+                this.signatureImage = value;
+                this.OnPropertyChanged();
+            }
         }
 
-        public ImagesModel RawNumbers { get; }
+        public string IdentifiedNumberResult
+        {
+            get => this.identifiedNumberResult;
+            set
+            {
+                if (value != this.identifiedNumberResult)
+                {
+                    this.identifiedNumberResult = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
-        public ImagesModel NumbersAsBinaryImage { get; }
-
-        public ImagesModel CroppedBinaryImages { get; }
-
-        public ImagesModel DownSizedBinaryImages { get; }
-
-        public ImagesModel NumbersAsSmoothedBinaryImages { get; }
-
-        public ImagesModel NumbersAsThinnedBinaryImages { get; }
-
-        public ImagesModel SampledImages { get; }
-
-        public ImagesModel SignatureOfNumbers { get; }
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         private static async Task<TReturn[]> ExecuteFunctionOnImagesAsync<TIn, TReturn>(
             IEnumerable<TIn> images,
@@ -116,13 +121,14 @@
             return processedImages;
         }
 
-        private static void WriteImageToAppDirectory(BitmapSource image, string imageName)
+        private static void WriteImageToAppDirectory(BinaryImage binaryImage, string imageName)
         {
             if (!WriteCalculatedImagesToDisk)
             {
                 return;
             }
 
+            var image = binaryImage.ToBitmapImage();
             string currentDirectory = Environment.CurrentDirectory;
             BitmapEncoder encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(image));
@@ -132,158 +138,96 @@
             encoder.Save(fileStream);
         }
 
-        private IEnumerable<BitmapImage> LoadImages()
+        private static BinaryImage ProcessImageToBinaryImage(BitmapImage bitmapImage)
         {
-            var rawImages = new List<byte[]>
-            {
-                ImageResource._0,
-                ImageResource._1,
-                ImageResource._2,
-                ImageResource._3,
-                ImageResource._4,
-                ImageResource._5,
-                ImageResource._6,
-                ImageResource._7,
-                ImageResource._8,
-                ImageResource._9
-            };
+            var processedImage = BinaryImage.FromImage(bitmapImage.ToBitmap());
 
-            for (var i = 0; i < rawImages.Count; i++)
-            {
-                this.RawNumbers[i] = rawImages[i].ToBitmapImage();
-            }
+            WriteImageToAppDirectory(processedImage, "binary.png");
 
-            return this.RawNumbers.GetImages().ToArray();
+            return processedImage;
         }
 
-        private async Task<BinaryImage[]> ProcessImagesToBinaryImagesAsync(IEnumerable<BitmapImage> bitmapImages)
+        private static BinaryImage CropImage(BinaryImage binaryImage)
         {
-            BinaryImage ConvertingFunction(int index, BitmapImage bitmapImage)
-            {
-                var processedImage = BinaryImage.FromImage(bitmapImage.ToBitmap());
-                var processedBitmapImage = processedImage.ToBitmapImage();
-                this.NumbersAsBinaryImage[index] = processedBitmapImage;
-                WriteImageToAppDirectory(processedBitmapImage, $"binary_{index:00}.png");
-                return processedImage;
-            }
+            var processedImage = ImageProcessor.CropAroundFigures(binaryImage);
 
-            return await ExecuteFunctionOnImagesAsync(
-                bitmapImages,
-                ConvertingFunction);
+            WriteImageToAppDirectory(processedImage, "cropped.png");
+
+            return processedImage;
         }
 
-        private async Task<BinaryImage[]> CropImagesAsync(IEnumerable<BinaryImage> binaryImages)
+        private static BinaryImage DownSizeImage(BinaryImage binaryImage)
         {
-            BinaryImage CroppingFunction(int index, BinaryImage binaryImage)
-            {
-                var processedImage = ImageProcessor.CropAroundFigures(binaryImage);
-                var processedBitmapImage = processedImage.ToBitmapImage();
-                this.CroppedBinaryImages[index] = processedBitmapImage;
-                WriteImageToAppDirectory(processedBitmapImage, $"cropped_{index:00}.png");
-                return processedImage;
-            }
+            var processedImage = ImageProcessor.DownSizeToHalf(binaryImage);
 
-            return await ExecuteFunctionOnImagesAsync(
-                binaryImages,
-                CroppingFunction);
+            WriteImageToAppDirectory(processedImage, "downSized.png");
+
+            return processedImage;
         }
 
-        private async Task<BinaryImage[]> DownSizeImagesAsync(IEnumerable<BinaryImage> binaryImages)
+        private static BinaryImage ApplySmoothing(BinaryImage binaryImage)
         {
-            BinaryImage ShrinkingFunction(int index, BinaryImage binaryImage)
-            {
-                var processedImage = ImageProcessor.DownSizeToHalf(binaryImage);
-                var processedBitmapImage = processedImage.ToBitmapImage();
-                this.DownSizedBinaryImages[index] = processedBitmapImage;
-                WriteImageToAppDirectory(processedBitmapImage, $"downSized_{index:00}.png");
-                return processedImage;
-            }
+            var processedImage = ImageProcessor.Smoothing(binaryImage);
 
-            return await ExecuteFunctionOnImagesAsync(
-                binaryImages,
-                ShrinkingFunction);
+            WriteImageToAppDirectory(processedImage, $"smoothed.png");
+
+            return processedImage;
         }
 
-        private async Task<BinaryImage[]> ApplySmoothingAsync(IEnumerable<BinaryImage> binaryImages)
+        private static BinaryImage ApplyThinning(BinaryImage binaryImage)
         {
-            BinaryImage SmoothingFunction(int index, BinaryImage binaryImage)
-            {
-                var processedImage = ImageProcessor.Smoothing(binaryImage);
-                var processedBitmapImage = processedImage.ToBitmapImage();
-                this.NumbersAsSmoothedBinaryImages[index] = processedBitmapImage;
-                WriteImageToAppDirectory(processedBitmapImage, $"smoothed_{index:00}.png");
-                return processedImage;
-            }
+            const int MaxNumberOfIterations = 35;
 
-            return await ExecuteFunctionOnImagesAsync(
-                binaryImages,
-                SmoothingFunction);
-        }
+            BinaryImage img = binaryImage;
+            BinaryImage previousImg = binaryImage;
 
-        private async Task<BinaryImage[]> ApplyThinningAsync(IEnumerable<BinaryImage> binaryImages)
-        {
-            async Task<BinaryImage> ThinningFunctionAsync(int index, BinaryImage binaryImage)
+            for (int i = 0; i < MaxNumberOfIterations; i++)
             {
-                BinaryImage img = binaryImage;
-                BinaryImage previousImg = binaryImage;
-                for (int i = 0; i < 35; i++)
+                img = ImageProcessor.Thinning(img);
+
+                if (img.Equals(previousImg))
                 {
-                    img = await Task.Run(
-                        () =>
-                        {
-                            var thinnedImg = ImageProcessor.Thinning(img);
-                            this.NumbersAsThinnedBinaryImages[index] = thinnedImg.ToBitmapImage();
-                            this.NumbersAsThinnedBinaryImages.SetProcessingIteration(index, i);
-                            return thinnedImg;
-                        });
-
-                    if (img.Equals(previousImg))
-                    {
-                        // no changes after last thinning -> abort
-                        return img;
-                    }
-
-                    previousImg = img;
+                    // no changes after last thinning -> abort
+                    return img;
                 }
 
-                return img;
+                previousImg = img;
             }
 
-            return await ExecuteFunctionOnImagesAsync(
-                binaryImages,
-                ThinningFunctionAsync);
+            return img;
         }
 
-        private async Task DrawSignatureSamplingLinesOn(IEnumerable<BinaryImage> binaryImages)
+        private static BinaryImage CalculateSignature(BinaryImage binaryImage)
         {
-            Bitmap FunctionAsync(int index, BinaryImage binaryImage)
-            {
-                var processedImage = ImageProcessor.DrawSignatureSamplingLinesOn(binaryImage, SamplingRate);
-                var processedBitmapImage = processedImage.ToBitmapImage();
-                this.SampledImages[index] = processedBitmapImage;
-                WriteImageToAppDirectory(processedBitmapImage, $"sampledSignature{SamplingRate}_{index:00}.png");
-                return processedImage;
-            }
+            var processedImage = ImageProcessor.GetSignatureIn(binaryImage, SamplingRate);
 
-            await ExecuteFunctionOnImagesAsync(
-                binaryImages,
-                FunctionAsync);
+            WriteImageToAppDirectory(processedImage, $"signature{SamplingRate}.png");
+
+            return processedImage;
         }
 
-        private async Task CalculateSignatureAsync(IEnumerable<BinaryImage> binaryImages)
+        private static BitmapImage LoadImage()
         {
-            BinaryImage FunctionAsync(int index, BinaryImage binaryImage)
-            {
-                var processedImage = ImageProcessor.GetSignatureIn(binaryImage, SamplingRate);
-                var processedBitmapImage = processedImage.ToBitmapImage();
-                this.SignatureOfNumbers[index] = processedBitmapImage;
-                WriteImageToAppDirectory(processedBitmapImage, $"signature{SamplingRate}_{index:00}.png");
-                return processedImage;
-            }
+            return ImageResource._1.ToBitmapImage();
+        }
 
-            await ExecuteFunctionOnImagesAsync(
-                binaryImages,
-                FunctionAsync);
+        private async Task IdentifyImageAsync()
+        {
+            var calculateSignatureOfImage = await Task.Run(this.CalculateSignatureOfImage);
+            SignatureImage = calculateSignatureOfImage.ToBitmapImage();
+            this.IdentifiedNumberResult = new Random().Next(0, 9).ToString();
+        }
+
+        private BinaryImage CalculateSignatureOfImage()
+        {
+            var rawBitmapImage = LoadImage();
+            var binaryImage = ProcessImageToBinaryImage(rawBitmapImage);
+            var croppedImage = CropImage(binaryImage);
+            var downSizedImage = DownSizeImage(croppedImage);
+            var smoothedImage = ApplySmoothing(downSizedImage);
+            var thinnedImage = ApplyThinning(smoothedImage);
+
+            return CalculateSignature(thinnedImage);
         }
     }
 }

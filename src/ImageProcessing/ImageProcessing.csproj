@@ -22,6 +22,32 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="NumbersBySignature\img\rawInputNumbers\0.jpg" />
+    <None Remove="NumbersBySignature\img\rawInputNumbers\0b.jpg" />
+    <None Remove="NumbersBySignature\img\rawInputNumbers\1.jpg" />
+    <None Remove="NumbersBySignature\img\rawInputNumbers\2.jpg" />
+    <None Remove="NumbersBySignature\img\rawInputNumbers\3.jpg" />
+    <None Remove="NumbersBySignature\img\rawInputNumbers\4.jpg" />
+    <None Remove="NumbersBySignature\img\rawInputNumbers\4b.jpg" />
+    <None Remove="NumbersBySignature\img\rawInputNumbers\5.jpg" />
+    <None Remove="NumbersBySignature\img\rawInputNumbers\6.jpg" />
+    <None Remove="NumbersBySignature\img\rawInputNumbers\7.jpg" />
+    <None Remove="NumbersBySignature\img\rawInputNumbers\7b.jpg" />
+    <None Remove="NumbersBySignature\img\rawInputNumbers\8.jpg" />
+    <None Remove="NumbersBySignature\img\rawInputNumbers\9.jpg" />
+    <None Remove="NumbersBySignature\img\signatureTemplates\signTemplate360_00.png" />
+    <None Remove="NumbersBySignature\img\signatureTemplates\signTemplate360_01.png" />
+    <None Remove="NumbersBySignature\img\signatureTemplates\signTemplate360_02.png" />
+    <None Remove="NumbersBySignature\img\signatureTemplates\signTemplate360_03.png" />
+    <None Remove="NumbersBySignature\img\signatureTemplates\signTemplate360_04.png" />
+    <None Remove="NumbersBySignature\img\signatureTemplates\signTemplate360_05.png" />
+    <None Remove="NumbersBySignature\img\signatureTemplates\signTemplate360_06.png" />
+    <None Remove="NumbersBySignature\img\signatureTemplates\signTemplate360_07.png" />
+    <None Remove="NumbersBySignature\img\signatureTemplates\signTemplate360_08.png" />
+    <None Remove="NumbersBySignature\img\signatureTemplates\signTemplate360_09.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\..\..\doc\icon_256.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -49,6 +75,32 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ImageProcessingLib\ImageProcessingLib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="NumbersBySignature\img\rawInputNumbers\0.jpg" />
+    <Resource Include="NumbersBySignature\img\rawInputNumbers\0b.jpg" />
+    <Resource Include="NumbersBySignature\img\rawInputNumbers\1.jpg" />
+    <Resource Include="NumbersBySignature\img\rawInputNumbers\2.jpg" />
+    <Resource Include="NumbersBySignature\img\rawInputNumbers\3.jpg" />
+    <Resource Include="NumbersBySignature\img\rawInputNumbers\4.jpg" />
+    <Resource Include="NumbersBySignature\img\rawInputNumbers\4b.jpg" />
+    <Resource Include="NumbersBySignature\img\rawInputNumbers\5.jpg" />
+    <Resource Include="NumbersBySignature\img\rawInputNumbers\6.jpg" />
+    <Resource Include="NumbersBySignature\img\rawInputNumbers\7.jpg" />
+    <Resource Include="NumbersBySignature\img\rawInputNumbers\7b.jpg" />
+    <Resource Include="NumbersBySignature\img\rawInputNumbers\8.jpg" />
+    <Resource Include="NumbersBySignature\img\rawInputNumbers\9.jpg" />
+    <Resource Include="NumbersBySignature\img\signatureTemplates\signTemplate360_00.png" />
+    <Resource Include="NumbersBySignature\img\signatureTemplates\signTemplate360_01.png" />
+    <Resource Include="NumbersBySignature\img\signatureTemplates\signTemplate360_02.png" />
+    <Resource Include="NumbersBySignature\img\signatureTemplates\signTemplate360_03.png" />
+    <Resource Include="NumbersBySignature\img\signatureTemplates\signTemplate360_04.png" />
+    <Resource Include="NumbersBySignature\img\signatureTemplates\signTemplate360_05.png" />
+    <Resource Include="NumbersBySignature\img\signatureTemplates\signTemplate360_06.png" />
+    <Resource Include="NumbersBySignature\img\signatureTemplates\signTemplate360_07.png" />
+    <Resource Include="NumbersBySignature\img\signatureTemplates\signTemplate360_08.png" />
+    <Resource Include="NumbersBySignature\img\signatureTemplates\signTemplate360_09.png" />
   </ItemGroup>
 
 </Project>
