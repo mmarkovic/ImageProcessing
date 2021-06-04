@@ -10,6 +10,7 @@
         <Description>Testproject of the sample application for demonstrating image processing techniques using C# .NET.</Description>
         <PackageLicenseExpression>MIT License</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/mmarkovic/ImageProcessing</PackageProjectUrl>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>

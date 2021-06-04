@@ -9,6 +9,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <PackageLicenseExpression>MIT License</PackageLicenseExpression>
         <PackageProjectUrl>https://github.com/mmarkovic/ImageProcessing</PackageProjectUrl>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>

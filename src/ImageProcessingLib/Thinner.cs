@@ -53,6 +53,7 @@
             foreach (var structuringElement in strEl)
             {
                 var hitAndMissImg = thinnedImage.Clone();
+                var image = thinnedImage;
 
                 Parallel.For(
                     0,
@@ -62,7 +63,7 @@
                         for (var n = 0; n < hitAndMissImg.Size.Width; n++)
                         {
                             var positionInImage = new MatrixPosition(m, n);
-                            var neighbourMatrix = thinnedImage.GetNeighbourMatrixFromPosition(
+                            var neighbourMatrix = image.GetNeighbourMatrixFromPosition(
                                 positionInImage,
                                 structuringElement.Size);
 

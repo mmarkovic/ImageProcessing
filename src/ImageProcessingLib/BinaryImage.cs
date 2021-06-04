@@ -304,7 +304,7 @@
             return new BinaryMatrix(this.image).ToString();
         }
 
-        public bool Equals(BinaryImage other)
+        public bool Equals(BinaryImage? other)
         {
             return other switch
             {
@@ -313,7 +313,7 @@
             };
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj))
             {

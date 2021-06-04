@@ -54,7 +54,7 @@
             return $"[{this.M},{this.N}]";
         }
 
-        public bool Equals(MatrixPosition other)
+        public bool Equals(MatrixPosition? other)
         {
             if (ReferenceEquals(null, other))
             {
@@ -64,7 +64,7 @@
             return this.M == other.M && this.N == other.N;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj))
             {

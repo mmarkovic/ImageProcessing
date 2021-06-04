@@ -8,7 +8,6 @@
     using System.Windows.Input;
     using System.Windows.Media.Imaging;
 
-    using ImageProcessing.Annotations;
     using ImageProcessing.NumbersBySignature.img;
 
     using ImageProcessingLib;
@@ -28,6 +27,7 @@
         {
             this.appConfig = appConfig;
             this.signatureImage = new BitmapImage();
+            this.identifiedNumberResult = "";
             this.IdentifyImageCommand = new AsyncRelayCommand(async _ => await this.IdentifyImageAsync());
         }
 
@@ -58,8 +58,7 @@
             }
         }
 
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

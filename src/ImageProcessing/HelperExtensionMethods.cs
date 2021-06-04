@@ -9,21 +9,43 @@
 
     using ImageProcessingLib;
 
-    public static class HelperExtensionMethods
+    internal static class HelperExtensionMethods
     {
-        public static Dictionary<int, T> ToIndexedDictionary<T>(this IEnumerable<T> list)
+        internal static Dictionary<int, T> ToIndexedDictionary<T>(this IEnumerable<T> list)
         {
             return list
                 .Select((element, index) => new { element, index })
                 .ToDictionary(k => k.index, v => v.element);
         }
 
-        public static BitmapImage ToBitmapImage(this BinaryImage binaryImage)
+        internal static BitmapImage ToBitmapImage(this BinaryImage binaryImage)
         {
             return binaryImage.ToBitmap().ToBitmapImage();
         }
 
-        public static BitmapImage ToBitmapImage(this Bitmap bitmap)
+        internal static BitmapImage ToBitmapImage(this byte[] array)
+        {
+            using var ms = new MemoryStream(array);
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.StreamSource = ms;
+            image.EndInit();
+
+            return image;
+        }
+
+        internal static Bitmap ToBitmap(this BitmapSource bitmapImage)
+        {
+            using var outStream = new MemoryStream();
+            BitmapEncoder enc = new BmpBitmapEncoder();
+            enc.Frames.Add(BitmapFrame.Create(bitmapImage));
+            enc.Save(outStream);
+
+            return new Bitmap(outStream);
+        }
+
+        private static BitmapImage ToBitmapImage(this Image bitmap)
         {
             using var ms = new MemoryStream();
             bitmap.Save(ms, ImageFormat.Bmp);
@@ -36,28 +58,6 @@
             bitmapImage.Freeze();
 
             return bitmapImage;
-        }
-
-        public static BitmapImage ToBitmapImage(this byte[] array)
-        {
-            using var ms = new MemoryStream(array);
-            var image = new BitmapImage();
-            image.BeginInit();
-            image.CacheOption = BitmapCacheOption.OnLoad;
-            image.StreamSource = ms;
-            image.EndInit();
-
-            return image;
-        }
-
-        public static Bitmap ToBitmap(this BitmapSource bitmapImage)
-        {
-            using var outStream = new MemoryStream();
-            BitmapEncoder enc = new BmpBitmapEncoder();
-            enc.Frames.Add(BitmapFrame.Create(bitmapImage));
-            enc.Save(outStream);
-
-            return new Bitmap(outStream);
         }
     }
 }

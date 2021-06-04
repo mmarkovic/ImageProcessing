@@ -108,13 +108,13 @@
             return new BinaryMatrix(imageAsByteArray);
         }
 
-        public bool Equals(BinaryMatrix other)
+        public bool Equals(BinaryMatrix? other)
         {
             return !ReferenceEquals(null, other)
                    && (ReferenceEquals(this, other) || this.value.IsSequenceEqualTo(other.value));
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is BinaryMatrix other && this.Equals(other);
         }

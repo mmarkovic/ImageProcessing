@@ -11,6 +11,7 @@
     <PackageLicenseExpression>MIT License</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/mmarkovic/ImageProcessing</PackageProjectUrl>
     <PackageIcon>icon_256.png</PackageIcon>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

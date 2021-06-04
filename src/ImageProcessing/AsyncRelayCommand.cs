@@ -12,17 +12,23 @@
     public class AsyncRelayCommand : ICommand
     {
         private bool isExecuting;
-        private readonly Func<object, Task> execute;
-        private readonly Func<object, bool> canExecute;
+        private readonly Func<object?, Task> execute;
+        private readonly Func<object?, bool>? canExecute;
 
-        public AsyncRelayCommand(Func<object, Task> execute, Func<object, bool> canExecute = null)
+        public AsyncRelayCommand(Func<object?, Task> execute, Func<object?, bool>? canExecute = null)
         {
             this.isExecuting = false;
             this.execute = execute ?? throw new ArgumentNullException(nameof(execute));
             this.canExecute = canExecute;
         }
 
-        public bool CanExecute(object parameter)
+        public event EventHandler? CanExecuteChanged
+        {
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
+        }
+
+        public bool CanExecute(object? parameter)
         {
             if (this.isExecuting)
             {
@@ -32,7 +38,7 @@
             return this.canExecute?.Invoke(parameter) ?? true;
         }
 
-        public void Execute(object parameter)
+        public void Execute(object? parameter)
         {
             if (!this.CanExecute(parameter))
             {
@@ -51,12 +57,6 @@
             {
                 this.isExecuting = false;
             }
-        }
-
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
         }
     }
 }
