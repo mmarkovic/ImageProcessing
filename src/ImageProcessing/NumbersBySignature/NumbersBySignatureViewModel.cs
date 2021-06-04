@@ -2,6 +2,7 @@
 {
     using System;
     using System.ComponentModel;
+    using System.Drawing;
     using System.IO;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
@@ -18,6 +19,7 @@
 
         private string identifiedNumberResult;
         private BitmapImage signatureImage;
+        private BitmapImage signatureImageOnTemplate;
 
         public NumbersBySignatureViewModel() : this(new AppConfig())
         {
@@ -27,6 +29,7 @@
         {
             this.appConfig = appConfig;
             this.signatureImage = new BitmapImage();
+            this.signatureImageOnTemplate = new BitmapImage();
             this.identifiedNumberResult = "";
             this.IdentifyImageCommand = new AsyncRelayCommand(async _ => await this.IdentifyImageAsync());
         }
@@ -41,6 +44,16 @@
             private set
             {
                 this.signatureImage = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        public BitmapImage SignatureImageOnTemplate
+        {
+            get => this.signatureImageOnTemplate;
+            private set
+            {
+                this.signatureImageOnTemplate = value;
                 this.OnPropertyChanged();
             }
         }
@@ -159,8 +172,14 @@
         private async Task IdentifyImageAsync()
         {
             BinaryImage calculateSignatureOfImage = await Task.Run(this.CalculateSignatureOfImage);
+
             this.SignatureImage = calculateSignatureOfImage.ToBitmapImage(
                 BinaryImageColorSettings.TransparentBackground);
+
+            var redForeground = new BinaryImageColorSettings(Color.Red, Color.Transparent);
+            this.SignatureImageOnTemplate = calculateSignatureOfImage.ToBitmapImage(
+                redForeground);
+
             this.IdentifiedNumberResult = new Random().Next(0, 9).ToString();
         }
 
