@@ -78,63 +78,43 @@ number will be displayed as result."
                     </Grid.RowDefinitions>
 
                     <signatureTemplate:SignatureTemplateView
-                        NumberLabel="0"
-                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_00.png"
-                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
+                        DataContext="{Binding SignatureTemplateViewModels[0]}"
                         Grid.Column="0" Grid.Row="0" />
 
                     <signatureTemplate:SignatureTemplateView
-                        NumberLabel="1"
-                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_01.png"
-                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
+                        DataContext="{Binding SignatureTemplateViewModels[1]}"
                         Grid.Column="1" Grid.Row="0" />
 
                     <signatureTemplate:SignatureTemplateView
-                        NumberLabel="2"
-                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_02.png"
-                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
+                        DataContext="{Binding SignatureTemplateViewModels[2]}"
                         Grid.Column="2" Grid.Row="0" />
 
                     <signatureTemplate:SignatureTemplateView
-                        NumberLabel="3"
-                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_03.png"
-                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
+                        DataContext="{Binding SignatureTemplateViewModels[3]}"
                         Grid.Column="3" Grid.Row="0" />
 
                     <signatureTemplate:SignatureTemplateView
-                        NumberLabel="4"
-                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_04.png"
-                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
+                        DataContext="{Binding SignatureTemplateViewModels[4]}"
                         Grid.Column="4" Grid.Row="0" />
 
                     <signatureTemplate:SignatureTemplateView
-                        NumberLabel="5"
-                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_05.png"
-                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
+                        DataContext="{Binding SignatureTemplateViewModels[5]}"
                         Grid.Column="0" Grid.Row="1" />
 
                     <signatureTemplate:SignatureTemplateView
-                        NumberLabel="6"
-                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_06.png"
-                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
+                        DataContext="{Binding SignatureTemplateViewModels[6]}"
                         Grid.Column="1" Grid.Row="1" />
 
                     <signatureTemplate:SignatureTemplateView
-                        NumberLabel="7"
-                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_07.png"
-                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
+                        DataContext="{Binding SignatureTemplateViewModels[7]}"
                         Grid.Column="2" Grid.Row="1" />
 
                     <signatureTemplate:SignatureTemplateView
-                        NumberLabel="8"
-                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_08.png"
-                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
+                        DataContext="{Binding SignatureTemplateViewModels[8]}"
                         Grid.Column="3" Grid.Row="1" />
 
                     <signatureTemplate:SignatureTemplateView
-                        NumberLabel="9"
-                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_09.png"
-                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
+                        DataContext="{Binding SignatureTemplateViewModels[9]}"
                         Grid.Column="4" Grid.Row="1" />
                 </Grid>
             </DockPanel>

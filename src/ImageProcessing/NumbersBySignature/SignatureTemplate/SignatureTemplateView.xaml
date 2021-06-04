@@ -1,5 +1,4 @@
 ﻿<UserControl x:Class="ImageProcessing.NumbersBySignature.SignatureTemplate.SignatureTemplateView"
-             Name="UcSignatureTemplateView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -23,15 +22,15 @@
     </UserControl.Resources>
     <Grid>
         <Image
-            Source="{Binding SignatureTemplateImage, ElementName=UcSignatureTemplateView}"
+            Source="{Binding SignatureTemplateImage}"
             Stretch="Fill"
             Grid.Column="0" Grid.Row="0" />
         <Image
-            Source="{Binding CalculatedSignatureImage, ElementName=UcSignatureTemplateView}"
+            Source="{Binding CalculatedSignatureImage}"
             Stretch="Fill"
             Grid.Column="0" Grid.Row="0" />
         <TextBlock
-            Text="{Binding NumberLabel, ElementName=UcSignatureTemplateView}"
+            Text="{Binding NumberLabel}"
             Grid.Column="0" Grid.Row="0" />
     </Grid>
 </UserControl>

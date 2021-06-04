@@ -38,7 +38,7 @@
             return new Bitmap(outStream);
         }
 
-        private static BitmapImage ToBitmapImage(this Image bitmap)
+        internal static BitmapImage ToBitmapImage(this Image bitmap)
         {
             using var ms = new MemoryStream();
             bitmap.Save(ms, ImageFormat.Png);

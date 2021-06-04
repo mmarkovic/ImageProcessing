@@ -1,6 +1,7 @@
 ﻿namespace ImageProcessing.NumbersBySignature
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Drawing;
     using System.IO;
@@ -13,13 +14,15 @@
 
     using ImageProcessingLib;
 
+    using SignatureTemplate;
+
     public class NumbersBySignatureViewModel : INotifyPropertyChanged
     {
         private readonly IAppConfig appConfig;
+        private readonly SignatureTemplateViewModel[] signatureTemplateViewModels;
 
         private string identifiedNumberResult;
         private BitmapImage signatureImage;
-        private BitmapImage signatureImageOnTemplate;
 
         public NumbersBySignatureViewModel() : this(new AppConfig())
         {
@@ -29,7 +32,18 @@
         {
             this.appConfig = appConfig;
             this.signatureImage = new BitmapImage();
-            this.signatureImageOnTemplate = new BitmapImage();
+            this.signatureTemplateViewModels = new SignatureTemplateViewModel[10];
+
+            for (int i = 0; i < 10; i++)
+            {
+                var numberLabel = i.ToString();
+                object templateImageObject = ImageResource.ResourceManager.GetObject($"signTemplate_{i}")
+                    ?? throw new InvalidOperationException($"Signature Template for number {i} not found");
+                var signatureTemplateImage = ((Bitmap)templateImageObject).ToBitmapImage();
+
+                this.signatureTemplateViewModels[i] = new SignatureTemplateViewModel(numberLabel, signatureTemplateImage);
+            }
+
             this.identifiedNumberResult = "";
             this.IdentifyImageCommand = new AsyncRelayCommand(async _ => await this.IdentifyImageAsync());
         }
@@ -48,15 +62,8 @@
             }
         }
 
-        public BitmapImage SignatureImageOnTemplate
-        {
-            get => this.signatureImageOnTemplate;
-            private set
-            {
-                this.signatureImageOnTemplate = value;
-                this.OnPropertyChanged();
-            }
-        }
+        public IReadOnlyList<SignatureTemplateViewModel> SignatureTemplateViewModels
+            => this.signatureTemplateViewModels;
 
         public string IdentifiedNumberResult
         {
@@ -177,8 +184,13 @@
                 BinaryImageColorSettings.TransparentBackground);
 
             var redForeground = new BinaryImageColorSettings(Color.Red, Color.Transparent);
-            this.SignatureImageOnTemplate = calculateSignatureOfImage.ToBitmapImage(
+            var signatureImageOnTemplate = calculateSignatureOfImage.ToBitmapImage(
                 redForeground);
+
+            foreach (var signatureTemplateViewModel in this.signatureTemplateViewModels)
+            {
+                signatureTemplateViewModel.CalculatedSignatureImage = signatureImageOnTemplate;
+            }
 
             this.IdentifiedNumberResult = new Random().Next(0, 9).ToString();
         }

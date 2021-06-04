@@ -12,9 +12,14 @@
         private BitmapImage calculatedSignatureImage;
 
         public SignatureTemplateViewModel()
+            : this(string.Empty, new BitmapImage())
         {
-            this.numberLabel = string.Empty;
-            this.signatureTemplateImage = new BitmapImage();
+        }
+
+        public SignatureTemplateViewModel(string numberLabel, ImageSource signatureTemplateImage)
+        {
+            this.numberLabel = numberLabel;
+            this.signatureTemplateImage = signatureTemplateImage;
             this.calculatedSignatureImage = new BitmapImage();
         }
 
