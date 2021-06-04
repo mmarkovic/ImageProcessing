@@ -1,10 +1,8 @@
 ﻿namespace ImageProcessing.NumbersBySignature
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel;
     using System.IO;
-    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using System.Windows.Input;
@@ -17,29 +15,18 @@
 
     public class NumbersBySignatureViewModel : INotifyPropertyChanged
     {
-        /// <summary>
-        /// The applied sampling rate for calculating the signatures.
-        /// </summary>
-        /// <remarks>
-        /// The value should be in the range between 90 and 360.
-        /// </remarks>
-        private const int SamplingRate = 180;
-
-        /// <summary>
-        /// Determines if all processed images should be written on the disk.
-        /// </summary>
-        /// <remarks>
-        /// This is useful, to check every processing steps for debugging reasons and to
-        /// verify the applied algorithm. But if the application behaves as expected, it
-        /// can produced undesired noise and should therefore be deactivated.
-        /// </remarks>
-        private const bool WriteCalculatedImagesToDisk = false;
+        private readonly IAppConfig appConfig;
 
         private string identifiedNumberResult;
         private BitmapImage signatureImage;
 
-        public NumbersBySignatureViewModel()
+        public NumbersBySignatureViewModel() : this(new AppConfig())
         {
+        }
+
+        public NumbersBySignatureViewModel(IAppConfig appConfig)
+        {
+            this.appConfig = appConfig;
             this.signatureImage = new BitmapImage();
             this.IdentifyImageCommand = new AsyncRelayCommand(async _ => await this.IdentifyImageAsync());
         }
@@ -51,7 +38,7 @@
         public BitmapImage SignatureImage
         {
             get => this.signatureImage;
-            set
+            private set
             {
                 this.signatureImage = value;
                 this.OnPropertyChanged();
@@ -61,7 +48,7 @@
         public string IdentifiedNumberResult
         {
             get => this.identifiedNumberResult;
-            set
+            private set
             {
                 if (value != this.identifiedNumberResult)
                 {
@@ -77,104 +64,43 @@
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private static async Task<TReturn[]> ExecuteFunctionOnImagesAsync<TIn, TReturn>(
-            IEnumerable<TIn> images,
-            Func<int, TIn, TReturn> processingFunction)
-        {
-            var binaryImagesDict = images.ToIndexedDictionary();
-
-            var processedImages = await Task.WhenAll(
-                binaryImagesDict
-                    .Select(
-                        kvp =>
-                        {
-                            return Task.Run(
-                                () =>
-                                {
-                                    (int index, TIn binaryImage) = kvp;
-                                    return processingFunction(index, binaryImage);
-                                });
-                        }));
-
-            return processedImages;
-        }
-
-        private static async Task<BinaryImage[]> ExecuteFunctionOnImagesAsync(
-            IEnumerable<BinaryImage> binaryImages,
-            Func<int, BinaryImage, Task<BinaryImage>> processingFunctionAsync)
-        {
-            var binaryImagesDict = binaryImages.ToIndexedDictionary();
-
-            var processedImages = await Task.WhenAll(
-                binaryImagesDict
-                    .Select(
-                        kvp =>
-                        {
-                            return Task.Run(
-                                async () =>
-                                {
-                                    (int index, BinaryImage binaryImage) = kvp;
-                                    return await processingFunctionAsync(index, binaryImage);
-                                });
-                        }));
-
-            return processedImages;
-        }
-
-        private static void WriteImageToAppDirectory(BinaryImage binaryImage, string imageName)
-        {
-            if (!WriteCalculatedImagesToDisk)
-            {
-                return;
-            }
-
-            var image = binaryImage.ToBitmapImage();
-            string currentDirectory = Environment.CurrentDirectory;
-            BitmapEncoder encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(image));
-            string filePath = Path.Combine(currentDirectory, imageName);
-
-            using var fileStream = new FileStream(filePath, FileMode.Create);
-            encoder.Save(fileStream);
-        }
-
-        private static BinaryImage ProcessImageToBinaryImage(BitmapImage bitmapImage)
+        private BinaryImage ProcessImageToBinaryImage(BitmapImage bitmapImage)
         {
             var processedImage = BinaryImage.FromImage(bitmapImage.ToBitmap());
 
-            WriteImageToAppDirectory(processedImage, "binary.png");
+            this.WriteImageToAppDirectory(processedImage, "binary.png");
 
             return processedImage;
         }
 
-        private static BinaryImage CropImage(BinaryImage binaryImage)
+        private BinaryImage CropImage(BinaryImage binaryImage)
         {
             var processedImage = ImageProcessor.CropAroundFigures(binaryImage);
 
-            WriteImageToAppDirectory(processedImage, "cropped.png");
+            this.WriteImageToAppDirectory(processedImage, "cropped.png");
 
             return processedImage;
         }
 
-        private static BinaryImage DownSizeImage(BinaryImage binaryImage)
+        private BinaryImage DownSizeImage(BinaryImage binaryImage)
         {
             var processedImage = ImageProcessor.DownSizeToHalf(binaryImage);
 
-            WriteImageToAppDirectory(processedImage, "downSized.png");
+            this.WriteImageToAppDirectory(processedImage, "downSized.png");
 
             return processedImage;
         }
 
-        private static BinaryImage ApplySmoothing(BinaryImage binaryImage)
+        private BinaryImage ApplySmoothing(BinaryImage binaryImage)
         {
             var processedImage = ImageProcessor.Smoothing(binaryImage);
 
-            WriteImageToAppDirectory(processedImage, $"smoothed.png");
+            this.WriteImageToAppDirectory(processedImage, "smoothed.png");
 
             return processedImage;
         }
 
-        private static BinaryImage ApplyThinning(BinaryImage binaryImage)
+        private BinaryImage ApplyThinning(BinaryImage binaryImage)
         {
             const int MaxNumberOfIterations = 35;
 
@@ -184,6 +110,8 @@
             for (int i = 0; i < MaxNumberOfIterations; i++)
             {
                 img = ImageProcessor.Thinning(img);
+
+                this.WriteImageToAppDirectory(img, $"thinned_itr{i:00}.png");
 
                 if (img.Equals(previousImg))
                 {
@@ -197,13 +125,31 @@
             return img;
         }
 
-        private static BinaryImage CalculateSignature(BinaryImage binaryImage)
+        private BinaryImage CalculateSignature(BinaryImage binaryImage)
         {
-            var processedImage = ImageProcessor.GetSignatureIn(binaryImage, SamplingRate);
+            int samplingRate = this.appConfig.SignatureSamplingRate;
+            var processedImage = ImageProcessor.GetSignatureIn(binaryImage, samplingRate);
 
-            WriteImageToAppDirectory(processedImage, $"signature{SamplingRate}.png");
+            this.WriteImageToAppDirectory(processedImage, $"signature{samplingRate}.png");
 
             return processedImage;
+        }
+
+        private void WriteImageToAppDirectory(BinaryImage binaryImage, string imageName)
+        {
+            if (!this.appConfig.WriteProcessedImagesToDisk)
+            {
+                return;
+            }
+
+            var image = binaryImage.ToBitmapImage();
+            string currentDirectory = Environment.CurrentDirectory;
+            BitmapEncoder encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(image));
+            string filePath = Path.Combine(currentDirectory, imageName);
+
+            using var fileStream = new FileStream(filePath, FileMode.Create);
+            encoder.Save(fileStream);
         }
 
         private static BitmapImage LoadImage()
@@ -221,13 +167,13 @@
         private BinaryImage CalculateSignatureOfImage()
         {
             var rawBitmapImage = LoadImage();
-            var binaryImage = ProcessImageToBinaryImage(rawBitmapImage);
-            var croppedImage = CropImage(binaryImage);
-            var downSizedImage = DownSizeImage(croppedImage);
-            var smoothedImage = ApplySmoothing(downSizedImage);
-            var thinnedImage = ApplyThinning(smoothedImage);
+            var binaryImage = this.ProcessImageToBinaryImage(rawBitmapImage);
+            var croppedImage = this.CropImage(binaryImage);
+            var downSizedImage = this.DownSizeImage(croppedImage);
+            var smoothedImage = this.ApplySmoothing(downSizedImage);
+            var thinnedImage = this.ApplyThinning(smoothedImage);
 
-            return CalculateSignature(thinnedImage);
+            return this.CalculateSignature(thinnedImage);
         }
     }
 }
