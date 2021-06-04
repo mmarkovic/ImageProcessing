@@ -1,4 +1,5 @@
 ﻿<UserControl x:Class="ImageProcessing.NumbersBySignature.NumbersBySignatureView"
+             xmlns:signatureTemplate="clr-namespace:ImageProcessing.NumbersBySignature.SignatureTemplate"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -64,19 +65,6 @@ number will be displayed as result."
             <DockPanel Grid.Row="2" DockPanel.Dock="Bottom">
                 <TextBlock DockPanel.Dock="Top" Style="{StaticResource Title2Style}" Text="Signature Match" />
                 <Grid>
-                    <Grid.Resources>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Foreground" Value="Snow" />
-                            <Setter Property="Background">
-                                <Setter.Value>
-                                    <SolidColorBrush Color="Gray" Opacity="0.9" />
-                                </Setter.Value>
-                            </Setter>
-                            <Setter Property="VerticalAlignment" Value="Top" />
-                            <Setter Property="HorizontalAlignment" Value="Left" />
-                            <Setter Property="Padding" Value="2 0" />
-                        </Style>
-                    </Grid.Resources>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition />
@@ -88,76 +76,66 @@ number will be displayed as result."
                         <RowDefinition />
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    <Image Source="./img/signatureTemplates/signTemplate360_00.png" Stretch="Fill"
-                           Grid.Column="0" Grid.Row="0" />
-                    <Image
-                        Stretch="Fill"
-                        Source="{Binding SignatureImageOnTemplate}"
+
+                    <signatureTemplate:SignatureTemplateView
+                        NumberLabel="0"
+                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_00.png"
+                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
                         Grid.Column="0" Grid.Row="0" />
-                    <TextBlock Grid.Column="0" Grid.Row="0" Text="0" />
-                    <Image Source="./img/signatureTemplates/signTemplate360_01.png" Stretch="Fill"
-                           Grid.Column="1" Grid.Row="0" />
-                    <Image
-                        Stretch="Fill"
-                        Source="{Binding SignatureImageOnTemplate}"
+
+                    <signatureTemplate:SignatureTemplateView
+                        NumberLabel="1"
+                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_01.png"
+                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
                         Grid.Column="1" Grid.Row="0" />
-                    <TextBlock Grid.Column="1" Grid.Row="0" Text="1" />
-                    <Image Source="./img/signatureTemplates/signTemplate360_02.png" Stretch="Fill"
-                           Grid.Column="2" Grid.Row="0" />
-                    <Image
-                        Stretch="Fill"
-                        Source="{Binding SignatureImageOnTemplate}"
+
+                    <signatureTemplate:SignatureTemplateView
+                        NumberLabel="2"
+                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_02.png"
+                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
                         Grid.Column="2" Grid.Row="0" />
-                    <TextBlock Grid.Column="2" Grid.Row="0" Text="2" />
-                    <Image Source="./img/signatureTemplates/signTemplate360_03.png" Stretch="Fill"
-                           Grid.Column="3" Grid.Row="0" />
-                    <Image
-                        Stretch="Fill"
-                        Source="{Binding SignatureImageOnTemplate}"
+
+                    <signatureTemplate:SignatureTemplateView
+                        NumberLabel="3"
+                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_03.png"
+                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
                         Grid.Column="3" Grid.Row="0" />
-                    <TextBlock Grid.Column="3" Grid.Row="0" Text="3" />
-                    <Image Source="./img/signatureTemplates/signTemplate360_04.png" Stretch="Fill"
-                           Grid.Column="4" Grid.Row="0" />
-                    <Image
-                        Stretch="Fill"
-                        Source="{Binding SignatureImageOnTemplate}"
+
+                    <signatureTemplate:SignatureTemplateView
+                        NumberLabel="4"
+                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_04.png"
+                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
                         Grid.Column="4" Grid.Row="0" />
-                    <TextBlock Grid.Column="4" Grid.Row="0" Text="4" />
-                    <Image Source="./img/signatureTemplates/signTemplate360_05.png" Stretch="Fill"
-                           Grid.Column="0" Grid.Row="1" />
-                    <Image
-                        Stretch="Fill"
-                        Source="{Binding SignatureImageOnTemplate}"
+
+                    <signatureTemplate:SignatureTemplateView
+                        NumberLabel="5"
+                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_05.png"
+                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
                         Grid.Column="0" Grid.Row="1" />
-                    <TextBlock Grid.Column="0" Grid.Row="1" Text="5" />
-                    <Image Source="./img/signatureTemplates/signTemplate360_06.png" Stretch="Fill"
-                           Grid.Column="1" Grid.Row="1" />
-                    <Image
-                        Stretch="Fill"
-                        Source="{Binding SignatureImageOnTemplate}"
+
+                    <signatureTemplate:SignatureTemplateView
+                        NumberLabel="6"
+                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_06.png"
+                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
                         Grid.Column="1" Grid.Row="1" />
-                    <TextBlock Grid.Column="1" Grid.Row="1" Text="6" />
-                    <Image Source="./img/signatureTemplates/signTemplate360_07.png" Stretch="Fill"
-                           Grid.Column="2" Grid.Row="1" />
-                    <Image
-                        Stretch="Fill"
-                        Source="{Binding SignatureImageOnTemplate}"
+
+                    <signatureTemplate:SignatureTemplateView
+                        NumberLabel="7"
+                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_07.png"
+                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
                         Grid.Column="2" Grid.Row="1" />
-                    <TextBlock Grid.Column="2" Grid.Row="1" Text="7" />
-                    <Image Source="./img/signatureTemplates/signTemplate360_08.png" Stretch="Fill"
-                           Grid.Column="3" Grid.Row="1" />
-                    <Image
-                        Stretch="Fill"
-                        Source="{Binding SignatureImageOnTemplate}"
+
+                    <signatureTemplate:SignatureTemplateView
+                        NumberLabel="8"
+                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_08.png"
+                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
                         Grid.Column="3" Grid.Row="1" />
-                    <TextBlock Grid.Column="3" Grid.Row="1" Text="8" />
-                    <Image Source="./img/signatureTemplates/signTemplate360_09.png" Stretch="Fill"
-                           Grid.Column="4" Grid.Row="1" />
-                    <Image
-                        Stretch="Fill"
-                        Source="{Binding SignatureImageOnTemplate}"
+
+                    <signatureTemplate:SignatureTemplateView
+                        NumberLabel="9"
+                        SignatureTemplateImage="./img/signatureTemplates/signTemplate360_09.png"
+                        CalculatedSignatureImage="{Binding SignatureImageOnTemplate}"
                         Grid.Column="4" Grid.Row="1" />
-                    <TextBlock Grid.Column="4" Grid.Row="1" Text="9" />
                 </Grid>
             </DockPanel>
         </Grid>
