@@ -158,8 +158,8 @@
 
         private async Task IdentifyImageAsync()
         {
-            var calculateSignatureOfImage = await Task.Run(this.CalculateSignatureOfImage);
-            SignatureImage = calculateSignatureOfImage.ToBitmapImage();
+            BinaryImage calculateSignatureOfImage = await Task.Run(this.CalculateSignatureOfImage);
+            this.SignatureImage = calculateSignatureOfImage.ToBitmapImage(BackgroundSettings.Transparent);
             this.IdentifiedNumberResult = new Random().Next(0, 9).ToString();
         }
 

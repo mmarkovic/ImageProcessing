@@ -1,26 +1,19 @@
 ﻿namespace ImageProcessing
 {
-    using System.Collections.Generic;
     using System.Drawing;
     using System.Drawing.Imaging;
     using System.IO;
-    using System.Linq;
     using System.Windows.Media.Imaging;
 
     using ImageProcessingLib;
 
     internal static class HelperExtensionMethods
     {
-        internal static Dictionary<int, T> ToIndexedDictionary<T>(this IEnumerable<T> list)
+        internal static BitmapImage ToBitmapImage(
+            this BinaryImage binaryImage,
+            BackgroundSettings background = BackgroundSettings.White)
         {
-            return list
-                .Select((element, index) => new { element, index })
-                .ToDictionary(k => k.index, v => v.element);
-        }
-
-        internal static BitmapImage ToBitmapImage(this BinaryImage binaryImage)
-        {
-            return binaryImage.ToBitmap().ToBitmapImage();
+            return binaryImage.ToBitmap(background).ToBitmapImage();
         }
 
         internal static BitmapImage ToBitmapImage(this byte[] array)
@@ -48,7 +41,7 @@
         private static BitmapImage ToBitmapImage(this Image bitmap)
         {
             using var ms = new MemoryStream();
-            bitmap.Save(ms, ImageFormat.Bmp);
+            bitmap.Save(ms, ImageFormat.Png);
             ms.Position = 0;
             var bitmapImage = new BitmapImage();
             bitmapImage.BeginInit();

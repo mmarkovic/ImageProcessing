@@ -126,13 +126,19 @@
             return new((byte[,])this.image.Clone());
         }
 
-        public Bitmap ToBitmap()
+        public Bitmap ToBitmap(BackgroundSettings background = BackgroundSettings.White)
         {
-            const PixelFormat PixelFormat = PixelFormat.Format32bppRgb;
-            var bmp = new Bitmap(this.Size.Width, this.Size.Height);
+            const byte BlackColorValue = 0;
+            const byte WhiteColorValue = 255;
+
+            var pixelFormat = background == BackgroundSettings.Transparent
+                ? PixelFormat.Format32bppArgb
+                : PixelFormat.Format32bppRgb;
+
+            var bmp = new Bitmap(this.Size.Width, this.Size.Height, pixelFormat);
             var rectangle = new Rectangle(0, 0, bmp.Width, bmp.Height);
-            var bitmapData = bmp.LockBits(rectangle, ImageLockMode.WriteOnly, PixelFormat);
-            int bytesPerPixel = Image.GetPixelFormatSize(PixelFormat) / 8;
+            var bitmapData = bmp.LockBits(rectangle, ImageLockMode.WriteOnly, pixelFormat);
+            int bytesPerPixel = Image.GetPixelFormatSize(pixelFormat) / 8;
 
             int heightInPixels = bitmapData.Height;
             int widthInPixels = bitmapData.Width;
@@ -150,11 +156,17 @@
                         for (var n = 0; n < widthInPixels; n++)
                         {
                             int byteX = n * bytesPerPixel;
-                            var colorValue = (byte)(this.image[m, n] == White ? 255 : 0);
+                            byte colorValue = (this.image[m, n] == White ? WhiteColorValue : BlackColorValue);
 
                             ptrCurrentLine[byteX] = colorValue; // blue
                             ptrCurrentLine[byteX + 1] = colorValue; // green
                             ptrCurrentLine[byteX + 2] = colorValue; // red
+
+                            if (background == BackgroundSettings.Transparent)
+                            {
+                                byte alphaValue = colorValue == WhiteColorValue ? (byte)0 : (byte)255;
+                                ptrCurrentLine[byteX + 3] = alphaValue;
+                            }
                         }
                     });
             }
