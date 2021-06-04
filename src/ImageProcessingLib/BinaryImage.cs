@@ -126,12 +126,14 @@
             return new((byte[,])this.image.Clone());
         }
 
-        public Bitmap ToBitmap(BackgroundSettings background = BackgroundSettings.White)
+        public Bitmap ToBitmap()
         {
-            const byte BlackColorValue = 0;
-            const byte WhiteColorValue = 255;
+            return this.ToBitmap(BinaryImageColorSettings.Default);
+        }
 
-            var pixelFormat = background == BackgroundSettings.Transparent
+        public Bitmap ToBitmap(BinaryImageColorSettings colorSettings)
+        {
+            var pixelFormat = colorSettings.UsesTransparent
                 ? PixelFormat.Format32bppArgb
                 : PixelFormat.Format32bppRgb;
 
@@ -156,16 +158,16 @@
                         for (var n = 0; n < widthInPixels; n++)
                         {
                             int byteX = n * bytesPerPixel;
-                            byte colorValue = (this.image[m, n] == White ? WhiteColorValue : BlackColorValue);
+                            bool isForeground = this.image[m, n] == Black;
+                            var color = isForeground ? colorSettings.Foreground : colorSettings.Background;
 
-                            ptrCurrentLine[byteX] = colorValue; // blue
-                            ptrCurrentLine[byteX + 1] = colorValue; // green
-                            ptrCurrentLine[byteX + 2] = colorValue; // red
+                            ptrCurrentLine[byteX] = color.B; // blue
+                            ptrCurrentLine[byteX + 1] = color.G; // green
+                            ptrCurrentLine[byteX + 2] = color.R; // red
 
-                            if (background == BackgroundSettings.Transparent)
+                            if (colorSettings.UsesTransparent)
                             {
-                                byte alphaValue = colorValue == WhiteColorValue ? (byte)0 : (byte)255;
-                                ptrCurrentLine[byteX + 3] = alphaValue;
+                                ptrCurrentLine[byteX + 3] = color.A; // alpha
                             }
                         }
                     });

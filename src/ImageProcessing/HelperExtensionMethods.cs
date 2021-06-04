@@ -11,9 +11,9 @@
     {
         internal static BitmapImage ToBitmapImage(
             this BinaryImage binaryImage,
-            BackgroundSettings background = BackgroundSettings.White)
+            BinaryImageColorSettings colorSettings)
         {
-            return binaryImage.ToBitmap(background).ToBitmapImage();
+            return binaryImage.ToBitmap(colorSettings).ToBitmapImage();
         }
 
         internal static BitmapImage ToBitmapImage(this byte[] array)

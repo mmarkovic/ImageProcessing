@@ -141,7 +141,7 @@
                 return;
             }
 
-            var image = binaryImage.ToBitmapImage();
+            var image = binaryImage.ToBitmapImage(BinaryImageColorSettings.Default);
             string currentDirectory = Environment.CurrentDirectory;
             BitmapEncoder encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(image));
@@ -159,7 +159,8 @@
         private async Task IdentifyImageAsync()
         {
             BinaryImage calculateSignatureOfImage = await Task.Run(this.CalculateSignatureOfImage);
-            this.SignatureImage = calculateSignatureOfImage.ToBitmapImage(BackgroundSettings.Transparent);
+            this.SignatureImage = calculateSignatureOfImage.ToBitmapImage(
+                BinaryImageColorSettings.TransparentBackground);
             this.IdentifiedNumberResult = new Random().Next(0, 9).ToString();
         }
 
