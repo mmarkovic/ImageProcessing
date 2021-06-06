@@ -6,7 +6,7 @@
         /// Compares two multidimensional byte arrays and returns true, if their values are exactly the same;
         /// otherwise false.
         /// </summary>
-        public static bool IsSequenceEqualTo(this byte[,] left, byte[,] right)
+        public static bool IsSequenceEqualTo(this bool[,] left, bool[,] right)
         {
             int width = left.GetLength(0);
             if (width != right.GetLength(0))

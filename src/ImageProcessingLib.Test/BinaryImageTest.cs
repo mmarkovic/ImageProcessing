@@ -23,21 +23,21 @@
 
             // first row
             int m = 0;
-            sampleImage[m, 0].Should().Be(0);
-            sampleImage[m, 1].Should().Be(1);
-            sampleImage[m, 2].Should().Be(0);
+            sampleImage[m, 0].Should().Be(BinaryImage.White);
+            sampleImage[m, 1].Should().Be(BinaryImage.Black);
+            sampleImage[m, 2].Should().Be(BinaryImage.White);
 
             // second row: m=1
             m = 1;
-            sampleImage[m, 0].Should().Be(1);
-            sampleImage[m, 1].Should().Be(0);
-            sampleImage[m, 2].Should().Be(1);
+            sampleImage[m, 0].Should().Be(BinaryImage.Black);
+            sampleImage[m, 1].Should().Be(BinaryImage.White);
+            sampleImage[m, 2].Should().Be(BinaryImage.Black);
 
             // third row: m=2
             m = 2;
-            sampleImage[m, 0].Should().Be(1);
-            sampleImage[m, 1].Should().Be(0);
-            sampleImage[m, 2].Should().Be(0);
+            sampleImage[m, 0].Should().Be(BinaryImage.Black);
+            sampleImage[m, 1].Should().Be(BinaryImage.White);
+            sampleImage[m, 2].Should().Be(BinaryImage.White);
         }
 
         [Fact]

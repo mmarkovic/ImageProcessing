@@ -1,6 +1,5 @@
 ﻿namespace ImageProcessingLib
 {
-    using System;
     using System.Drawing;
     using System.Threading.Tasks;
 
@@ -39,9 +38,7 @@
                                 int imageM = m - MatrixRadius + matrixM;
                                 int imageN = n - MatrixRadius + matrixN;
 
-                                matrixColors[matrixM, matrixN] = img[imageM, imageN] > 0
-                                    ? BinaryImage.Black
-                                    : BinaryImage.White;
+                                matrixColors[matrixM, matrixN] = img[imageM, imageN];
                             }
                         }
 

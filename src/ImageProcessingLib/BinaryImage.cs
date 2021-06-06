@@ -7,7 +7,7 @@
 
     /// <summary>
     /// Represents a image in its binary form.
-    /// The value 1 represents the color 'black' and the value 0 the color 'white'.
+    /// The value 1/true represents the color 'black' and the value 0/false the color 'white'.
     /// </summary>
     /// <remarks>
     /// <![CDATA[
@@ -26,20 +26,20 @@
     /// </remarks>
     public sealed class BinaryImage : IEquatable<BinaryImage>
     {
-        public const byte White = 0;
-        public const byte Black = 1;
+        public const bool White = false;
+        public const bool Black = true;
 
-        private readonly byte[,] image;
+        private readonly bool[,] image;
 
         public Size Size { get; }
 
-        public byte this[int m, int n]
+        public bool this[int m, int n]
         {
             get => this.image[m, n];
             set => this.image[m, n] = value;
         }
 
-        public byte this[MatrixPosition position]
+        public bool this[MatrixPosition position]
         {
             get => this.image[position.M, position.N];
             set => this.image[position.M, position.N] = value;
@@ -47,11 +47,11 @@
 
         public BinaryImage(int width, int height)
         {
-            this.image = new byte[height, width];
+            this.image = new bool[height, width];
             this.Size = new Size(width, height);
         }
 
-        private BinaryImage(byte[,] image)
+        private BinaryImage(bool[,] image)
         {
             this.image = image;
             this.Size = new Size(image.GetLength(1), image.GetLength(0));
@@ -69,7 +69,8 @@
 
         public static BinaryImage FromByteArray(byte[,] image)
         {
-            return new BinaryImage(image);
+            var binaryMatrix = new BinaryMatrix(image);
+            return new BinaryImage(binaryMatrix.To2DBoolArray());
         }
 
         public static BinaryImage FromImage(Bitmap bmp)
@@ -83,7 +84,7 @@
         {
             const int BitsPerByte = 8;
 
-            var image = new byte[bmp.Height, bmp.Width];
+            var image = new bool[bmp.Height, bmp.Width];
             var rectangle = new Rectangle(0, 0, bmp.Width, bmp.Height);
             var bitmapData = bmp.LockBits(rectangle, ImageLockMode.ReadOnly, bmp.PixelFormat);
             int bytesPerPixel = Image.GetPixelFormatSize(bmp.PixelFormat) / BitsPerByte;
@@ -128,7 +129,7 @@
         /// </remarks>
         private static BinaryImage FromIndexedImage(Bitmap indexedImage)
         {
-            var image = new byte[indexedImage.Height, indexedImage.Width];
+            var image = new bool[indexedImage.Height, indexedImage.Width];
 
             var rectangle = new Rectangle(0, 0, indexedImage.Width, indexedImage.Height);
             var bitmapData = indexedImage.LockBits(rectangle, ImageLockMode.ReadOnly, indexedImage.PixelFormat);
@@ -163,7 +164,7 @@
             return new BinaryImage(image);
         }
 
-        private static byte ThresholdFunction(Color colorValue)
+        private static bool ThresholdFunction(Color colorValue)
         {
             // Defines the threshold which determines if a pixel should be painted in white or black.
             const int ThresholdValue = 50;
@@ -177,7 +178,7 @@
 
         public BinaryImage Clone()
         {
-            return new((byte[,])this.image.Clone());
+            return new((bool[,])this.image.Clone());
         }
 
         public Bitmap ToBitmap()

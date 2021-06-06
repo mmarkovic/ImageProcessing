@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Drawing;
     using System.Text;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Represents a matrix consisting of only the values 0 and 1.
@@ -28,11 +29,17 @@
     /// </remarks>
     public sealed class BinaryMatrix : IEquatable<BinaryMatrix>
     {
-        private readonly byte[,] value;
+        public static readonly byte WhiteValue = Convert.ToByte(White);
+        public static readonly byte BlackValue = Convert.ToByte(Black);
+
+        public const bool White = BinaryImage.White;
+        public const bool Black = BinaryImage.Black;
+
+        private readonly bool[,] value;
 
         public Size Size { get; }
 
-        public byte this[int m, int n]
+        public bool this[int m, int n]
         {
             get => this.value[m, n];
             set => this.value[m, n] = value;
@@ -40,13 +47,33 @@
 
         public BinaryMatrix(byte[,] value)
         {
+            int height = value.GetLength(0);
+            int width = value.GetLength(1);
+            bool[,] binaryArray = new bool[height, width];
+            Parallel.For(
+                0,
+                height,
+                m =>
+                {
+                    for (int n = 0; n < width; n++)
+                    {
+                        binaryArray[m, n] = value[m, n] > 0 ? Black : White;
+                    }
+                });
+
+            this.value = binaryArray;
+            this.Size = new Size(value.GetLength(1), value.GetLength(0));
+        }
+
+        public BinaryMatrix(bool[,] value)
+        {
             this.value = value;
             this.Size = new Size(value.GetLength(1), value.GetLength(0));
         }
 
         public BinaryMatrix(Size size)
         {
-            this.value = new byte[size.Height, size.Width];
+            this.value = new bool[size.Height, size.Width];
             this.Size = size;
         }
 
@@ -68,22 +95,22 @@
                 .Replace(" ", string.Empty)
                 .ToCharArray();
 
-            var imageAsTwoDimensionalList = new List<List<byte>>();
-            var currentLine = new List<byte>();
+            var imageAsTwoDimensionalList = new List<List<bool>>();
+            var currentLine = new List<bool>();
 
             foreach (char character in characters)
             {
                 switch (character)
                 {
                     case '1':
-                        currentLine.Add(1);
+                        currentLine.Add(Black);
                         break;
                     case '0':
-                        currentLine.Add(0);
+                        currentLine.Add(White);
                         break;
                     case '\n':
                         imageAsTwoDimensionalList.Add(currentLine);
-                        currentLine = new List<byte>();
+                        currentLine = new List<bool>();
                         break;
                     default:
                         throw new ArgumentException($"Invalid character: {character}");
@@ -96,7 +123,7 @@
                 imageAsTwoDimensionalList.Add(currentLine);
             }
 
-            var imageAsByteArray = new byte[currentLine.Count, imageAsTwoDimensionalList.Count];
+            var imageAsByteArray = new bool[currentLine.Count, imageAsTwoDimensionalList.Count];
             for (var m = 0; m < imageAsTwoDimensionalList.Count; m++)
             {
                 for (var n = 0; n < currentLine.Count; n++)
@@ -148,13 +175,18 @@
             {
                 for (var n = 0; n < this.Size.Width; n++)
                 {
-                    sum += this.value[m, n];
+                    sum += this.value[m, n] == Black ? BlackValue : WhiteValue;
                 }
             }
 
             int numberOfValues = this.Size.Height * this.Size.Width;
 
             return sum / (float)numberOfValues;
+        }
+
+        public bool[,] To2DBoolArray()
+        {
+            return this.value;
         }
 
         public override string ToString()
@@ -168,7 +200,7 @@
             {
                 for (var n = 0; n < this.Size.Width; n++)
                 {
-                    stringBuilder.Append(this.value[m, n]);
+                    stringBuilder.Append(this.value[m, n] == Black ? BlackValue : WhiteValue);
                     numberOfCharactersPrinted++;
 
                     if (numberOfCharactersPrinted > MaxCharactersToPrint)

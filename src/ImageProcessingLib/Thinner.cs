@@ -92,7 +92,11 @@
                         continue;
                     }
 
-                    if (structuringElement[m, n] != matrix[m, n])
+                    byte matrixValue = matrix[m, n] == BinaryMatrix.Black
+                        ? BinaryMatrix.BlackValue
+                        : BinaryMatrix.WhiteValue;
+
+                    if (structuringElement[m, n] != matrixValue)
                     {
                         return false;
                     }
