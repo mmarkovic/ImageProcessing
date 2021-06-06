@@ -17,7 +17,7 @@ namespace ImageProcessingLib
             Size sizeOfNeighbourMatrix,
             BinaryMatrix expectedResult)
         {
-            var result = binaryImage.GetNeighbourMatrixFromPosition(positionInImage, sizeOfNeighbourMatrix);
+            var result = binaryImage.GetNeighborMatrixFromPosition(positionInImage, sizeOfNeighbourMatrix);
 
             result.Should().Be(expectedResult);
         }

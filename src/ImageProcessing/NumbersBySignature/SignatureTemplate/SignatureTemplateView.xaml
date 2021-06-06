@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ImageProcessing.NumbersBySignature.SignatureTemplate"
              mc:Ignorable="d"
-             d:DataContext="{d:DesignInstance d:Type={x:Type local:SignatureTemplateViewModel}}"
+             d:DataContext="{d:DesignInstance d:Type={x:Type local:SignatureTemplateViewModelAsync}}"
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <Style TargetType="TextBlock">
@@ -19,18 +19,23 @@
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="Padding" Value="2 0" />
         </Style>
+        <local:MatchToColorConverter x:Key="MatchToColorConverter" />
+        <local:MatchToThicknessConverter x:Key="MatchToThicknessConverter" />
     </UserControl.Resources>
-    <Grid>
-        <Image
-            Source="{Binding SignatureTemplateImage}"
-            Stretch="Fill"
-            Grid.Column="0" Grid.Row="0" />
-        <Image
-            Source="{Binding CalculatedSignatureImage}"
-            Stretch="Fill"
-            Grid.Column="0" Grid.Row="0" />
-        <TextBlock
-            Text="{Binding NumberLabel}"
-            Grid.Column="0" Grid.Row="0" />
-    </Grid>
+    <Border BorderBrush="{Binding IsMatch, Converter={StaticResource MatchToColorConverter}}"
+            BorderThickness="{Binding IsMatch, Converter={StaticResource MatchToThicknessConverter}}">
+        <Grid>
+            <Image
+                Source="{Binding SignatureTemplateImage}"
+                Stretch="Fill"
+                Grid.Column="0" Grid.Row="0" />
+            <Image
+                Source="{Binding CalculatedSignatureImage}"
+                Stretch="Fill"
+                Grid.Column="0" Grid.Row="0" />
+            <TextBlock
+                Text="{Binding NumberLabel}"
+                Grid.Column="0" Grid.Row="0" />
+        </Grid>
+    </Border>
 </UserControl>

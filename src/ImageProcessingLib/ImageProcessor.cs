@@ -1,5 +1,6 @@
 ﻿namespace ImageProcessingLib
 {
+    using System;
     using System.Drawing;
     using System.Threading.Tasks;
 
@@ -74,10 +75,9 @@
             return SignaturePlotter.Plot(signature);
         }
 
-        public static Bitmap DrawSignatureSamplingLinesOn(BinaryImage binaryImage, int samplingRate = 64)
+        public static bool VerifyIfSignatureMatchesToTemplate(BinaryImage signatureImage, BinaryImage templateImage)
         {
-            var samplingLines = SignatureReader.GetSamplingLines(binaryImage, samplingRate);
-            return SamplingLinePlotter.Plot(binaryImage, samplingLines);
+            return SignatureMatcher.IsMatch(signatureImage, templateImage);
         }
     }
 }

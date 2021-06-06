@@ -69,22 +69,27 @@
 
         public static BinaryImage FromByteArray(byte[,] image)
         {
-            return new(image);
+            return new BinaryImage(image);
         }
 
         public static BinaryImage FromImage(Bitmap bmp)
         {
-            // Defines the threshold which determines if a pixel should be painted in white or black.
-            const int ThresholdValue = 120;
+            return bmp.PixelFormat == PixelFormat.Format8bppIndexed
+                ? FromIndexedImage(bmp)
+                : FromNonIndexedImage(bmp);
+        }
+
+        private static BinaryImage FromNonIndexedImage(Bitmap bmp)
+        {
             const int BitsPerByte = 8;
 
             var image = new byte[bmp.Height, bmp.Width];
             var rectangle = new Rectangle(0, 0, bmp.Width, bmp.Height);
             var bitmapData = bmp.LockBits(rectangle, ImageLockMode.ReadOnly, bmp.PixelFormat);
-            var bytesPerPixel = Image.GetPixelFormatSize(bmp.PixelFormat) / BitsPerByte;
+            int bytesPerPixel = Image.GetPixelFormatSize(bmp.PixelFormat) / BitsPerByte;
 
-            var heightInPixels = bitmapData.Height;
-            var widthInPixels = bitmapData.Width;
+            int heightInPixels = bitmapData.Height;
+            int widthInPixels = bitmapData.Width;
 
             unsafe
             {
@@ -95,23 +100,18 @@
                     heightInPixels,
                     m =>
                     {
-                        var ptrCurrentLine = ptrFirstPixel + (m * bitmapData.Stride);
+                        byte* ptrCurrentLine = ptrFirstPixel + (m * bitmapData.Stride);
 
                         for (var n = 0; n < widthInPixels; n++)
                         {
                             var byteX = n * bytesPerPixel;
 
-                            // here the color white has the value of rgb(255, 255, 255).
-                            if (ptrCurrentLine[byteX + 2] > ThresholdValue // red
-                                || ptrCurrentLine[byteX + 1] > ThresholdValue // green
-                                || ptrCurrentLine[byteX] > ThresholdValue) // blue
-                            {
-                                image[m, n] = White;
-                            }
-                            else
-                            {
-                                image[m, n] = Black;
-                            }
+                            var color = Color.FromArgb(
+                                ptrCurrentLine[byteX + 2],
+                                ptrCurrentLine[byteX + 1],
+                                ptrCurrentLine[byteX]);
+
+                            image[m, n] = ThresholdFunction(color);
                         }
                     });
             }
@@ -119,6 +119,60 @@
             bmp.UnlockBits(bitmapData);
 
             return new BinaryImage(image);
+        }
+
+        /// <remarks>
+        /// Indexed images use only a reference value for representing the value of a color. The referenced value
+        /// is just an index (a pointer) to the actual color value, which can be retrieved from the image color
+        /// palette (<see cref="Image.Palette"/>).
+        /// </remarks>
+        private static BinaryImage FromIndexedImage(Bitmap indexedImage)
+        {
+            var image = new byte[indexedImage.Height, indexedImage.Width];
+
+            var rectangle = new Rectangle(0, 0, indexedImage.Width, indexedImage.Height);
+            var bitmapData = indexedImage.LockBits(rectangle, ImageLockMode.ReadOnly, indexedImage.PixelFormat);
+            int stride = bitmapData.Stride < 0 ? -bitmapData.Stride : bitmapData.Stride;
+
+            int heightInPixels = bitmapData.Height;
+            int widthInPixels = bitmapData.Width;
+            var colorPalette = indexedImage.Palette.Entries;
+
+            unsafe
+            {
+                var ptrFirstPixel = (byte*)bitmapData.Scan0;
+
+                Parallel.For(
+                    0,
+                    heightInPixels,
+                    m =>
+                    {
+                        byte* ptrCurrentLine = ptrFirstPixel + (m * stride);
+
+                        for (var n = 0; n < widthInPixels; n++)
+                        {
+                            byte colorReferenceIndex = ptrCurrentLine[n];
+                            Color color = colorPalette[colorReferenceIndex];
+                            image[m, n] = ThresholdFunction(color);
+                        }
+                    });
+            }
+
+            indexedImage.UnlockBits(bitmapData);
+
+            return new BinaryImage(image);
+        }
+
+        private static byte ThresholdFunction(Color colorValue)
+        {
+            // Defines the threshold which determines if a pixel should be painted in white or black.
+            const int ThresholdValue = 50;
+
+            return colorValue.R < ThresholdValue
+                   || colorValue.G < ThresholdValue
+                   || colorValue.B < ThresholdValue
+                ? Black
+                : White;
         }
 
         public BinaryImage Clone()
@@ -178,9 +232,20 @@
             return bmp;
         }
 
-        public BinaryMatrix GetNeighbourMatrixFromPosition(int m, int n, int matrixSize)
+        /// <summary>
+        /// Gets a value indicating if the binary images is empty, meaning if there is no Black pixel present.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c>, if the image has no Black pixels; otherwise <c>false</c>.
+        /// </returns>
+        public bool IsEmpty()
         {
-            return this.GetNeighbourMatrixFromPosition(
+            return this.FindLeftMostPixelIn() == -1;
+        }
+
+        public BinaryMatrix GetNeighborMatrixFromPosition(int m, int n, int matrixSize)
+        {
+            return this.GetNeighborMatrixFromPosition(
                 new MatrixPosition(m, n),
                 new Size(matrixSize, matrixSize));
         }
@@ -205,7 +270,7 @@
         ///  y, m
         /// ]]>
         /// </remarks>
-        public BinaryMatrix GetNeighbourMatrixFromPosition(MatrixPosition positionInImage, Size matrixSize)
+        public BinaryMatrix GetNeighborMatrixFromPosition(MatrixPosition positionInImage, Size matrixSize)
         {
             var neighbourMatrix = new BinaryMatrix(matrixSize);
             int fromLeftEdgeToCenterOffset = matrixSize.Width > 2 ? matrixSize.Width / 2 : 0;

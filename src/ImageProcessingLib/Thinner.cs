@@ -63,7 +63,7 @@
                         for (var n = 0; n < hitAndMissImg.Size.Width; n++)
                         {
                             var positionInImage = new MatrixPosition(m, n);
-                            var neighbourMatrix = image.GetNeighbourMatrixFromPosition(
+                            var neighbourMatrix = image.GetNeighborMatrixFromPosition(
                                 positionInImage,
                                 structuringElement.Size);
 

@@ -5,20 +5,20 @@
     using System.Windows.Input;
 
     /// <remarks>
-    /// The idea of this code was taken from the blog post of John Thiriet.
-    /// Some minor modifications where applied.
-    /// Source: https://johnthiriet.com/mvvm-going-async-with-async-command/ (03.06.2021)
+    /// The ideas of this code were taken from the following sources:
+    /// - https://johnthiriet.com/mvvm-going-async-with-async-command/ (03.06.2021)
+    /// - https://www.youtube.com/watch?v=dbh1st68Tco (04.06.2021)
     /// </remarks>
     public class AsyncRelayCommand : ICommand
     {
         private bool isExecuting;
-        private readonly Func<object?, Task> execute;
+        private readonly Func<object?, Task> executeAsync;
         private readonly Func<object?, bool>? canExecute;
 
-        public AsyncRelayCommand(Func<object?, Task> execute, Func<object?, bool>? canExecute = null)
+        public AsyncRelayCommand(Func<object?, Task> executeAsync, Func<object?, bool>? canExecute = null)
         {
             this.isExecuting = false;
-            this.execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            this.executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
             this.canExecute = canExecute;
         }
 
@@ -38,7 +38,7 @@
             return this.canExecute?.Invoke(parameter) ?? true;
         }
 
-        public void Execute(object? parameter)
+        public async void Execute(object? parameter)
         {
             if (!this.CanExecute(parameter))
             {
@@ -48,10 +48,7 @@
             try
             {
                 this.isExecuting = true;
-                Task.Run(() => this.execute(parameter))
-                    .ConfigureAwait(true)
-                    .GetAwaiter()
-                    .GetResult();
+                await this.executeAsync(parameter);
             }
             finally
             {

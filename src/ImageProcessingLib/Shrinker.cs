@@ -27,7 +27,7 @@
                         int originalN = downSizedN * 2;
                         var positionInImage = new MatrixPosition(originalM, originalN);
                         var neighbourMatrixFromPosition =
-                            image.GetNeighbourMatrixFromPosition(positionInImage, matrixSize);
+                            image.GetNeighborMatrixFromPosition(positionInImage, matrixSize);
                         float averageValue = neighbourMatrixFromPosition.GetAverageValue();
                         downSizedImage[downSizedM, downSizedN] = averageValue >= 0.75f
                             ? BinaryImage.Black

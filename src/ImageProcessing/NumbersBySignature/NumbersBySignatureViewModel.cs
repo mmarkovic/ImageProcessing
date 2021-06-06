@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Drawing;
-    using System.IO;
+    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using System.Windows.Input;
@@ -19,7 +19,7 @@
     public class NumbersBySignatureViewModel : INotifyPropertyChanged
     {
         private readonly IAppConfig appConfig;
-        private readonly SignatureTemplateViewModel[] signatureTemplateViewModels;
+        private readonly SignatureTemplateViewModelAsync[] signatureTemplateViewModels;
 
         private string identifiedNumberResult;
         private BitmapImage signatureImage;
@@ -32,7 +32,7 @@
         {
             this.appConfig = appConfig;
             this.signatureImage = new BitmapImage();
-            this.signatureTemplateViewModels = new SignatureTemplateViewModel[10];
+            this.signatureTemplateViewModels = new SignatureTemplateViewModelAsync[10];
 
             for (int i = 0; i < 10; i++)
             {
@@ -41,7 +41,7 @@
                     ?? throw new InvalidOperationException($"Signature Template for number {i} not found");
                 var signatureTemplateImage = ((Bitmap)templateImageObject).ToBitmapImage();
 
-                this.signatureTemplateViewModels[i] = new SignatureTemplateViewModel(numberLabel, signatureTemplateImage);
+                this.signatureTemplateViewModels[i] = new SignatureTemplateViewModelAsync(numberLabel, signatureTemplateImage);
             }
 
             this.identifiedNumberResult = "";
@@ -62,7 +62,7 @@
             }
         }
 
-        public IReadOnlyList<SignatureTemplateViewModel> SignatureTemplateViewModels
+        public IReadOnlyList<SignatureTemplateViewModelAsync> SignatureTemplateViewModels
             => this.signatureTemplateViewModels;
 
         public string IdentifiedNumberResult
@@ -154,7 +154,7 @@
             return processedImage;
         }
 
-        private void WriteImageToAppDirectory(BinaryImage binaryImage, string imageName)
+        private void WriteImageToAppDirectory(BinaryImage binaryImage, string imageFileName)
         {
             if (!this.appConfig.WriteProcessedImagesToDisk)
             {
@@ -162,13 +162,7 @@
             }
 
             var image = binaryImage.ToBitmapImage(BinaryImageColorSettings.Default);
-            string currentDirectory = Environment.CurrentDirectory;
-            BitmapEncoder encoder = new PngBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(image));
-            string filePath = Path.Combine(currentDirectory, imageName);
-
-            using var fileStream = new FileStream(filePath, FileMode.Create);
-            encoder.Save(fileStream);
+            image.SaveToAppDirectory(imageFileName);
         }
 
         private static BitmapImage LoadImage()
@@ -180,19 +174,20 @@
         {
             BinaryImage calculateSignatureOfImage = await Task.Run(this.CalculateSignatureOfImage);
 
-            this.SignatureImage = calculateSignatureOfImage.ToBitmapImage(
-                BinaryImageColorSettings.TransparentBackground);
+            this.SignatureImage = calculateSignatureOfImage
+                .ToBitmapImage(BinaryImageColorSettings.TransparentBackground);
 
-            var redForeground = new BinaryImageColorSettings(Color.Red, Color.Transparent);
-            var signatureImageOnTemplate = calculateSignatureOfImage.ToBitmapImage(
-                redForeground);
+            await Task.WhenAll(
+                this.signatureTemplateViewModels
+                    .Select(x => x.EvaluateSignatureToTemplateAsync(calculateSignatureOfImage)))
+                .ConfigureAwait(true);
 
-            foreach (var signatureTemplateViewModel in this.signatureTemplateViewModels)
-            {
-                signatureTemplateViewModel.CalculatedSignatureImage = signatureImageOnTemplate;
-            }
+            var matchesFound = this.signatureTemplateViewModels
+                .Where(x => x.IsMatch.HasValue && x.IsMatch.Value)
+                .Select(x => x.NumberLabel)
+                .ToArray();
 
-            this.IdentifiedNumberResult = new Random().Next(0, 9).ToString();
+            this.IdentifiedNumberResult = matchesFound.Any() ? string.Join(", ", matchesFound) : "?";
         }
 
         private BinaryImage CalculateSignatureOfImage()

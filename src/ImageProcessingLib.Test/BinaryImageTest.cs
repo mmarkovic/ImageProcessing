@@ -1,6 +1,10 @@
 ﻿namespace ImageProcessingLib
 {
+    using System;
+
     using FluentAssertions;
+
+    using ImageProcessingLib.TestData;
 
     using Xunit;
 
@@ -93,7 +97,7 @@
         }
 
         [Fact]
-        public void GetNeighbourMatrixFromPosition()
+        public void GetNeighborMatrixFromPosition()
         {
             var sampleImage = BinaryImage.FromByteArray(
                 new byte[,]
@@ -106,10 +110,57 @@
                     { 0, 0, 0, 0, 0, 0 },
                 });
 
-            sampleImage.GetNeighbourMatrixFromPosition(0, 0, 2).ToString().Should().Be("00\r\n01");
-            sampleImage.GetNeighbourMatrixFromPosition(1, 0, 2).ToString().Should().Be("01\r\n01");
-            sampleImage.GetNeighbourMatrixFromPosition(0, 1, 2).ToString().Should().Be("00\r\n11");
-            sampleImage.GetNeighbourMatrixFromPosition(1, 1, 2).ToString().Should().Be("11\r\n11");
+            sampleImage.GetNeighborMatrixFromPosition(0, 0, 2).ToString().Should().Be("00\r\n01");
+            sampleImage.GetNeighborMatrixFromPosition(1, 0, 2).ToString().Should().Be("01\r\n01");
+            sampleImage.GetNeighborMatrixFromPosition(0, 1, 2).ToString().Should().Be("00\r\n11");
+            sampleImage.GetNeighborMatrixFromPosition(1, 1, 2).ToString().Should().Be("11\r\n11");
+        }
+
+        [Fact]
+        public void CanConvertImagesToBinaryImageAndBack()
+        {
+            var signature01Image = BinaryImage.FromImage(TestDataResources.calculatedSign360_01);
+            signature01Image.IsEmpty().Should().BeFalse("signature must not be empty");
+
+            var converted = signature01Image.ToBitmap();
+
+            var convertedBackSignature01Image = BinaryImage.FromImage(converted);
+            convertedBackSignature01Image.IsEmpty().Should().BeFalse("signature must not be empty");
+
+            signature01Image.Should().Be(convertedBackSignature01Image);
+        }
+
+        [Fact]
+        public void CanConvertSignatureTemplateImagesToBinaryImageAndBack()
+        {
+            var templateImage = BinaryImage.FromImage(TestDataResources.signatureTemplate360_00);
+            templateImage.IsEmpty().Should().BeFalse("signature template must not be empty");
+
+            var converted = templateImage.ToBitmap();
+
+            var convertedBackImage = BinaryImage.FromImage(converted);
+            convertedBackImage.IsEmpty().Should().BeFalse("signature template must not be empty");
+
+            templateImage.Should().Be(convertedBackImage);
+        }
+
+        [Fact]
+        public void CanReadSignatureTemplates()
+        {
+            var binaryImage = BinaryImage.FromImage(TestDataResources.sampleSignTemplate);
+
+            string test = binaryImage.ToMatrixString();
+
+            test.Should().Be(
+                "1111100" + Environment.NewLine +
+                "1111000" + Environment.NewLine +
+                "1111000" + Environment.NewLine +
+                "1111000" + Environment.NewLine +
+                "1110000" + Environment.NewLine +
+                "1110000" + Environment.NewLine +
+                "1100000" + Environment.NewLine +
+                "1100000" + Environment.NewLine +
+                "1000000");
         }
     }
 }

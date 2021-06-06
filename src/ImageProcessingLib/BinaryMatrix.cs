@@ -159,7 +159,7 @@
 
         public override string ToString()
         {
-            const int MaxCharactersToPrint = 100;
+            const int MaxCharactersToPrint = 150;
             var numberOfCharactersPrinted = 0;
 
             var stringBuilder = new StringBuilder();

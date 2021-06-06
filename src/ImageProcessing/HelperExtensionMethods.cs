@@ -1,8 +1,10 @@
 ﻿namespace ImageProcessing
 {
+    using System;
     using System.Drawing;
     using System.Drawing.Imaging;
     using System.IO;
+    using System.Windows.Media;
     using System.Windows.Media.Imaging;
 
     using ImageProcessingLib;
@@ -51,6 +53,24 @@
             bitmapImage.Freeze();
 
             return bitmapImage;
+        }
+
+        internal static BinaryImage ToBinaryImage(this ImageSource image)
+        {
+            var bitmapImage = image as BitmapImage;
+            var bmp = bitmapImage!.ToBitmap();
+            return BinaryImage.FromImage(bmp);
+        }
+
+        internal static void SaveToAppDirectory(this BitmapImage image, string imageFileName)
+        {
+            string currentDirectory = Environment.CurrentDirectory;
+            BitmapEncoder encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(image));
+            string filePath = Path.Combine(currentDirectory, imageFileName);
+
+            using var fileStream = new FileStream(filePath, FileMode.Create);
+            encoder.Save(fileStream);
         }
     }
 }
