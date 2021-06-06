@@ -1,5 +1,6 @@
+# Signature Processing Steps
 
-### Step 1: convertion to binary image
+## Step 1: convertion to binary image
 
 An image is represented by a matrix containing its color as a RGB (red, green, blue) value. We can convert
 those pixels by applying a given threashold `t` to their color values. Is the average color value of a pixel
@@ -22,10 +23,10 @@ belove the threashold `t`, then we convert this pixel to black (represented by `
 
 Before (color) | . | After (binary)
 ---------------- | - | ------------------
-<img src="./doc/RawNumbers/5.jpg" height="100px"> | => | <img src="./doc/Binary/binary_05.png" height="100px">
+<img src="RawNumbers/5.jpg" height="100px" /> | => | <img src="Binary/binary_05.png" height="100px" />
 
 
-### Step 2: cropping
+## Step 2: cropping
 
 The goal of this step is to reduce the amount of pixels for further processing to speed up things. This
 can easily be done by cropping all unnecessary areas around our object in the image. For this we determine
@@ -51,10 +52,10 @@ m (zero based)
 
 Before | . | After (cropped)
 -------- | - | -------
-<img src="./doc/Binary/binary_05.png" height="100px"> | => | <img src="./doc/Cropped/cropped_05.png" height="100px">
+<img src="Binary/binary_05.png" height="100px"> | => | <img src="Cropped/cropped_05.png" height="100px">
 
 
-### Step 3: Shrinking
+## Step 3: Shrinking
 
 In this step we want to reduce the amout of pixels processed even further by shrinking the size of the
 image. For this we consider the pixels in a `2x2` matrix. If the majority of the pixels is `1` (black)
@@ -85,10 +86,10 @@ Original (16x16)            Shrinked (8x8)
 
 Before   | . | After (shrinked)
 -------- | - | -------
-<img src="./doc/Cropped/cropped_05.png" height="100px"> | => | <img src="./doc/DownSizing/img/downSizedImage_05.png" height="100px">
+<img src="Cropped/cropped_05.png" height="100px"> | => | <img src="DownSizing/img/downSizedImage_05.png" height="100px">
 
 
-### Step 4: Remove Noise (Smoothing)
+## Step 4: Remove Noise (Smoothing)
 
 Due to the previous shrinking process some pixels in the image seem off place. To remove unnecessary
 noises in the image, the next step will be to apply a smoothing filter. The smoothing filter is
@@ -110,33 +111,33 @@ If the center value of the smoothing filter matrix is `>= 0.5` then the pixel wi
 
 Before   | . | After (smoothed)
 -------- | - | -------
-<img src="./doc/DownSizing/img/downSizedImage_05.png" height="100px"> | => | <img src="./doc/Smoothing/img/smoothedImage_05.png" height="100px">
+<img src="DownSizing/img/downSizedImage_05.png" height="100px"> | => | <img src="Smoothing/img/smoothedImage_05.png" height="100px">
 
-### Step 5: Getting the Skeleton
+## Step 5: Getting the Skeleton
 
 The purpose of this step is to reduce thick areas to its core skeleton so that only the relevant
-pixel remain. The process of thinning is explained [here](./doc/Thinning/Readme.md)
+pixel remain. The process of thinning is explained [here](./Thinning/Readme.md)
 
 Start | 2nd iteration | 4th iteration | 6th iteration | 8th iteration | 11th iteration (final)
 ----- | ------------- | ------------- | ------------- | ------------- | -------------
-<img src="./doc/Thinning/img/thinndedImage_05_00.png" height="100px"> | <img src="./doc/Thinning/img/thinndedImage_05_02.png" height="100px"> | <img src="./doc/Thinning/img/thinndedImage_05_04.png" height="100px"> | <img src="./doc/Thinning/img/thinndedImage_05_06.png" height="100px"> | <img src="./doc/Thinning/img/thinndedImage_05_08.png" height="100px"> | <img src="./doc/Thinning/img/thinndedImage_05_11.png" height="100px">
+<img src="Thinning/img/thinndedImage_05_00.png" height="100px"> | <img src="Thinning/img/thinndedImage_05_02.png" height="100px"> | <img src="Thinning/img/thinndedImage_05_04.png" height="100px"> | <img src="Thinning/img/thinndedImage_05_06.png" height="100px"> | <img src="Thinning/img/thinndedImage_05_08.png" height="100px"> | <img src="Thinning/img/thinndedImage_05_11.png" height="100px">
 
-### Step 6: Getting the Signature
+## Step 6: Getting the Signature
 
 Based on the previously calculated skeleton we can now finally create the signature of the object.
 The signature is created by sampling the points from the center of the image and plot all the black
 pixels (value `1`) found on a graph.
 
-<img src="./doc/Signature/img/signatureExample.png" height="300px">
+<img src="Signature/img/signatureExample.png" height="300px">
 
 By applying the algorithm on the created skeleton we get the following result.
 
 sampling of number | resulting signature
 ------------------ | -------------------
-<img src="./doc/Signature/img/128/sampledSignature128_05.png" height="200px"> | <img src="./doc/Signature/img/360/signature360_05.png" >
+<img src="Signature/img/128/sampledSignature128_05.png" height="200px"> | <img src="Signature/img/360/signature360_05.png" >
 
 
-### Step 7: Comparing with Signature Template
+## Step 7: Comparing with Signature Template
 
 The last step is to compare the calculated signature with the predefined templates.
 
@@ -144,14 +145,14 @@ These are the templates used for the numbers.
 
  1  |  2  |  3 
 --- | --- | ---
-![1](./doc/SignatureTemplate/signTemplate360_01.png) | ![2](./doc/SignatureTemplate/signTemplate360_02.png) | ![3](./doc/SignatureTemplate/signTemplate360_03.png) | 
+![1](SignatureTemplate/signTemplate360_01.png) | ![2](SignatureTemplate/signTemplate360_02.png) | ![3](SignatureTemplate/signTemplate360_03.png) | 
 
  4  |  5  |  6 
 --- | --- | ---
-![4](./doc/SignatureTemplate/signTemplate360_04.png) | ![5](./doc/SignatureTemplate/signTemplate360_05.png) | ![6](./doc/SignatureTemplate/signTemplate360_06.png)
+![4](SignatureTemplate/signTemplate360_04.png) | ![5](SignatureTemplate/signTemplate360_05.png) | ![6](SignatureTemplate/signTemplate360_06.png)
 
  7  |  8  |  9  |  0
 --- | --- | --- | ---
-![7](./doc/SignatureTemplate/signTemplate360_07.png) | ![8](./doc/SignatureTemplate/signTemplate360_08.png) | ![9](./doc/SignatureTemplate/signTemplate360_09.png) | ![0](./doc/SignatureTemplate/signTemplate360_00.png)
+![7](SignatureTemplate/signTemplate360_07.png) | ![8](SignatureTemplate/signTemplate360_08.png) | ![9](SignatureTemplate/signTemplate360_09.png) | ![0](SignatureTemplate/signTemplate360_00.png)
 
 If all pixels of a signature are within the predefined template, then we consider this a match.
