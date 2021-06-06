@@ -4,15 +4,19 @@
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Drawing;
+    using System.IO;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
+    using System.Windows;
     using System.Windows.Input;
     using System.Windows.Media.Imaging;
 
     using ImageProcessing.NumbersBySignature.img;
 
     using ImageProcessingLib;
+
+    using Microsoft.Win32;
 
     using SignatureTemplate;
 
@@ -22,6 +26,7 @@
         private readonly SignatureTemplateViewModelAsync[] signatureTemplateViewModels;
 
         private string identifiedNumberResult;
+        private BitmapImage? startImage;
         private BitmapImage signatureImage;
 
         public NumbersBySignatureViewModel() : this(new AppConfig())
@@ -30,27 +35,39 @@
 
         public NumbersBySignatureViewModel(IAppConfig appConfig)
         {
+            this.startImage = null;
             this.appConfig = appConfig;
             this.signatureImage = new BitmapImage();
             this.signatureTemplateViewModels = new SignatureTemplateViewModelAsync[10];
-
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < this.signatureTemplateViewModels.Length; i++)
             {
-                var numberLabel = i.ToString();
-                object templateImageObject = ImageResource.ResourceManager.GetObject($"signTemplate_{i}")
-                    ?? throw new InvalidOperationException($"Signature Template for number {i} not found");
-                var signatureTemplateImage = ((Bitmap)templateImageObject).ToBitmapImage();
-
-                this.signatureTemplateViewModels[i] = new SignatureTemplateViewModelAsync(numberLabel, signatureTemplateImage);
+                this.signatureTemplateViewModels[i] = new SignatureTemplateViewModelAsync();
             }
 
             this.identifiedNumberResult = "";
-            this.IdentifyImageCommand = new AsyncRelayCommand(async _ => await this.IdentifyImageAsync());
+
+            this.IdentifyImageCommand = new AsyncRelayCommand(
+                async _ => await this.IdentifyImageAsync(),
+                _ => this.CanIdentifyImageAsync());
+
+            this.LoadImageCommand = new RelayCommand(_ => this.LoadImage());
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public ICommand IdentifyImageCommand { get; }
+
+        public ICommand LoadImageCommand { get; }
+
+        public BitmapImage? StartImage
+        {
+            get => this.startImage;
+            private set
+            {
+                this.startImage = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         public BitmapImage SignatureImage
         {
@@ -81,6 +98,20 @@
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void LoadSignatureTemplates()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                var numberLabel = i.ToString();
+                object templateImageObject = ImageResource.ResourceManager.GetObject($"signTemplate_{i}")
+                    ?? throw new InvalidOperationException($"Signature Template for number {i} not found");
+                var signatureTemplateImage = ((Bitmap)templateImageObject).ToBitmapImage();
+
+                this.signatureTemplateViewModels[i].NumberLabel = numberLabel;
+                this.signatureTemplateViewModels[i].SignatureTemplateImage = signatureTemplateImage;
+            }
         }
 
         private BinaryImage ProcessImageToBinaryImage(BitmapImage bitmapImage)
@@ -165,34 +196,81 @@
             image.SaveToAppDirectory(imageFileName);
         }
 
-        private static BitmapImage LoadImage()
+        private void LoadImage()
         {
-            return ImageResource._1.ToBitmapImage();
+            var openFileDialog = new OpenFileDialog
+            {
+                Filter = "Image files|*.bmp;*.gif;*.jpg;*jpeg;*.png;*.tiff|All files (*.*)|*.*",
+                Multiselect = false
+            };
+
+            if (openFileDialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            try
+            {
+                var filePath = openFileDialog.FileName;
+                var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+
+                var img = new BitmapImage();
+                img.BeginInit();
+                img.StreamSource = fileStream;
+                img.EndInit();
+
+                this.StartImage = img;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error loading image: " + e.Message);
+            }
+        }
+
+        private bool CanIdentifyImageAsync()
+        {
+            return this.startImage != null;
         }
 
         private async Task IdentifyImageAsync()
         {
-            BinaryImage calculateSignatureOfImage = await Task.Run(this.CalculateSignatureOfImage);
+            if (!this.CanIdentifyImageAsync())
+            {
+                return;
+            }
 
-            this.SignatureImage = calculateSignatureOfImage
-                .ToBitmapImage(BinaryImageColorSettings.TransparentBackground);
+            try
+            {
+                BinaryImage calculateSignatureOfImage = await Task.Run(this.CalculateSignatureOfImage);
 
-            await Task.WhenAll(
-                this.signatureTemplateViewModels
-                    .Select(x => x.EvaluateSignatureToTemplateAsync(calculateSignatureOfImage)))
-                .ConfigureAwait(true);
+                this.SignatureImage = calculateSignatureOfImage
+                    .ToBitmapImage(BinaryImageColorSettings.TransparentBackground);
 
-            var matchesFound = this.signatureTemplateViewModels
-                .Where(x => x.IsMatch.HasValue && x.IsMatch.Value)
-                .Select(x => x.NumberLabel)
-                .ToArray();
+                await Task.WhenAll(
+                    this.signatureTemplateViewModels
+                        .Select(x => x.EvaluateSignatureToTemplateAsync(calculateSignatureOfImage)))
+                    .ConfigureAwait(true);
 
-            this.IdentifiedNumberResult = matchesFound.Any() ? string.Join(", ", matchesFound) : "?";
+                var matchesFound = this.signatureTemplateViewModels
+                    .Where(x => x.IsMatch.HasValue && x.IsMatch.Value)
+                    .Select(x => x.NumberLabel)
+                    .ToArray();
+
+                this.IdentifiedNumberResult = matchesFound.Any() ? string.Join(", ", matchesFound) : "?";
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                MessageBox.Show("An error occurred: " + e.Message);
+
+                this.identifiedNumberResult = "error";
+            }
         }
 
         private BinaryImage CalculateSignatureOfImage()
         {
-            var rawBitmapImage = LoadImage();
+            var rawBitmapImage = this.startImage;
+
             var binaryImage = this.ProcessImageToBinaryImage(rawBitmapImage);
             var croppedImage = this.CropImage(binaryImage);
             var downSizedImage = this.DownSizeImage(croppedImage);

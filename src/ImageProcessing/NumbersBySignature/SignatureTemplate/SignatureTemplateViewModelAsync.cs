@@ -14,6 +14,8 @@
     {
         private BitmapImage calculatedSignatureImage;
         private bool? isMatch;
+        private string numberLabel;
+        private ImageSource signatureTemplateImage;
 
         public SignatureTemplateViewModelAsync()
             : this(string.Empty, new BitmapImage())
@@ -23,16 +25,35 @@
         public SignatureTemplateViewModelAsync(string numberLabel, ImageSource signatureTemplateImage)
         {
             this.isMatch = null;
-            this.NumberLabel = numberLabel;
-            this.SignatureTemplateImage = signatureTemplateImage;
+            this.numberLabel = numberLabel;
+            this.signatureTemplateImage = signatureTemplateImage;
             this.calculatedSignatureImage = new BitmapImage();
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public string NumberLabel { get; }
+        public string NumberLabel
+        {
+            get => this.numberLabel;
+            set
+            {
+                if (value != this.numberLabel)
+                {
+                    this.numberLabel = value;
+                    this.OnPropertyChanged();
+                }
+            }
+        }
 
-        public ImageSource SignatureTemplateImage { get; }
+        public ImageSource SignatureTemplateImage
+        {
+            get => this.signatureTemplateImage;
+            set
+            {
+                this.signatureTemplateImage = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         public BitmapImage CalculatedSignatureImage
         {
